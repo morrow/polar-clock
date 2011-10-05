@@ -32,7 +32,7 @@ clock =
       option = $(this).val().toLowerCase()
       clock.config[option.replace(' ', '').replace(/hide|show/, '').replace('normal', 'reverse').replace('dark','light')] = !option.match(/hide|normal|dark/)
       clock.setRadii() if option.match(/reverse|normal/)
-    $("[input[type=range]").delegate "input", "change click keyup blur", ->
+    $("[input[type=range]").live "change click keyup blur", ->
       clock.config[$(this)[0].className] = Math.max(Math.min($(this).val(), $(this).attr("max")), $(this).attr("min"))
       clock.setRadii()
       clock.saveConfig()

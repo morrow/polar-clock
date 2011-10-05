@@ -37,7 +37,7 @@ clock = {
         return clock.setRadii();
       }
     });
-    $("[input[type=range]").delegate("input", "change click keyup blur", function() {
+    $("[input[type=range]").live("change click keyup blur", function() {
       clock.config[$(this)[0].className] = Math.max(Math.min($(this).val(), $(this).attr("max")), $(this).attr("min"));
       clock.setRadii();
       return clock.saveConfig();
