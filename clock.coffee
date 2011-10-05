@@ -1,12 +1,16 @@
 clock = 
   
   config:
-    reverse: false
-    labels:  true
-    percentage: true
-    hue:  195
+    age:          25
+    expectancy:   85
+    reverse:      false
+    labels:       true
+    percentage:   true
+    hue:          195
     label_color:  90
+  
   radii: []
+  
   styles: {}
 
   initialize:->
@@ -14,19 +18,15 @@ clock =
     @ctx = @canvas.getContext("2d")
     @line_width = 50
     @setRadii()
-    @age = 25
-    @life_expectancy = 80
     @setTime()
-    $("#options").delegate "select", "change", ()->
+    $("#options").delegate "select", "change click keyup blur", ()->
       option = $(this).val().toLowerCase()
       clock.config[option.replace(' ', '').replace(/hide|show/, '').replace('normal', 'reverse')] = !option.match(/hide|normal/)
       if option.match(/reverse|normal/)
         clock.setRadii()
-    $("#color-slider").live "change", ()->
-      clock.config.hue = Math.max(Math.min($("#color-slider").val(), 360), 0)
+    $("#sliders").delegate "input", "change click keyup blur", ()->
+      clock.config[$(this)[0].className] = Math.max(Math.min($(this).val(), $(this).attr("max")), $(this).attr("min"))
       clock.setRadii()
-    $("#label-slider").live "change", ()->
-      clock.config.label_color = Math.max(Math.min($("#label-slider").val(), 100), 0)
 
   setRadii:->
     for item in ["minute", "hour", "day", "week", "year", "decade", "life"] 
@@ -88,6 +88,6 @@ clock =
     c = new Date(d.getFullYear(), 0, 1) # http://javascript.about.com/library/bldayyear.htm
     @year = (Math.ceil((d - c) / 86400000)) / 365 * 60 # http://javascript.about.com/library/bldayyear.htm
     @decade = (d.getYear() % 10) / 10  * 60
-    @life = (clock.age / clock.life_expectancy) * 60
+    @life = (clock.config.age / clock.config.expectancy) * 60
     @drawClock()
     
