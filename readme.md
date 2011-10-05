@@ -1,3 +1,5 @@
+Try the demo here: [http://morrow.github.com/Life-Clock/](http://morrow.github.com/Life-Clock/)
+
 This is an experimental canvas-based animated clock that aims to encourage long-term thinking.
 
 The short explanation is that it's a clock that goes beyond the traditional short-term scope of
