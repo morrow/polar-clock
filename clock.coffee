@@ -113,14 +113,14 @@ clock =
       text = ""
       text = item if @config.labels
       text += " - " if @config.labels and @config.percentage
-      text += "#{parseInt(clock[item]/60*100)}%" if @config.percentage
+      text += "#{Math.round(clock[item]/60*100)}%" if @config.percentage
       @ctx.fillText(text, @canvas.width/2+offset, @canvas.height/2-@radii[item]+offset) if text
 
   drawGrid:->
     return false if not @config.grid
     @ctx.beginPath()
     @ctx.lineWidth = 1
-    @ctx.strokeStyle = "black"
+    @ctx.strokeStyle = "rgba(0,0,0,.4)"
     @ctx.moveTo(@canvas.width/2, 0)
     @ctx.lineTo(@canvas.width/2, @canvas.height)
     @ctx.moveTo(0, @canvas.height/2)
@@ -150,7 +150,7 @@ clock =
     if context is "week" or "all"
       @week = ((d.getDay() + d.getHours() / 24) / 7) * 60
     if context is "month" or "all"
-      @month = (d.getDate() / (32 - new Date(d.getYear(), d.getMonth(), 32).getDate()) + @day/60) * 60
+      @month = (d.getDate() / (32 - new Date(d.getYear(), d.getMonth(), 32).getDate())) * 60 + @day/60
     if context is "year" or "all"
       @year = (Math.ceil((d - d2) / 86400000) + @day / 60) / 365 * 60
     if context is "decade" or "all"

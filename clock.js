@@ -153,7 +153,7 @@ clock = {
         text += " - ";
       }
       if (this.config.percentage) {
-        text += "" + (parseInt(clock[item] / 60 * 100)) + "%";
+        text += "" + (Math.round(clock[item] / 60 * 100)) + "%";
       }
       _results.push(text ? this.ctx.fillText(text, this.canvas.width / 2 + offset, this.canvas.height / 2 - this.radii[item] + offset) : void 0);
     }
@@ -165,7 +165,7 @@ clock = {
     }
     this.ctx.beginPath();
     this.ctx.lineWidth = 1;
-    this.ctx.strokeStyle = "black";
+    this.ctx.strokeStyle = "rgba(0,0,0,.4)";
     this.ctx.moveTo(this.canvas.width / 2, 0);
     this.ctx.lineTo(this.canvas.width / 2, this.canvas.height);
     this.ctx.moveTo(0, this.canvas.height / 2);
@@ -213,7 +213,7 @@ clock = {
       this.week = ((d.getDay() + d.getHours() / 24) / 7) * 60;
     }
     if (context === "month" || "all") {
-      this.month = (d.getDate() / (32 - new Date(d.getYear(), d.getMonth(), 32).getDate()) + this.day / 60) * 60;
+      this.month = (d.getDate() / (32 - new Date(d.getYear(), d.getMonth(), 32).getDate())) * 60 + this.day / 60;
     }
     if (context === "year" || "all") {
       this.year = (Math.ceil((d - d2) / 86400000) + this.day / 60) / 365 * 60;
