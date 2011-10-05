@@ -81,13 +81,16 @@ clock =
 
   setTime:->
     d = (new Date())
+    d2 = new Date(d.getFullYear(), 0, 1)
     @minute = d.getSeconds() + (parseInt(d.getTime() / 10) % parseInt(d.getTime() / 1000)) / 100
-    @hour = d.getMinutes() + (@minute/60)
-    @day = d.getHours() + (@hour/60)
-    @week = (d.getDay() / 7) * 60
-    c = new Date(d.getFullYear(), 0, 1) # http://javascript.about.com/library/bldayyear.htm
-    @year = (Math.ceil((d - c) / 86400000)) / 365 * 60 # http://javascript.about.com/library/bldayyear.htm
-    @decade = (d.getYear() % 10) / 10  * 60
-    @life = (clock.config.age / clock.config.expectancy) * 60
+    @hour = d.getMinutes() + (@minute / 60)
+    @day = d.getHours() + (@hour / 60)
+    @week = ((d.getDay() + d.getHours() / 24) / 7) * 60
+    @year = (Math.ceil((d - d2) / 86400000) + @day / 60) / 365 * 60
+    @decade = (d.getYear() % 10  + ((Math.ceil((d - d2) / 86400000)) / 365) + @hour / 60 / 365) / 10  * 60
+    @life = ((clock.config.age*365*24 + (Math.ceil((d - d2) / 86400000)) + @hour / 60)  / (clock.config.expectancy*365*24)) * 60
+    if @life == 60
+      @config.age = 1 
+      $(".age").val(1)
     @drawClock()
     
