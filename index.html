@@ -6,39 +6,51 @@
     <link rel="stylesheet" href="screen.css" />
   </head>
   <body>
-    <div id="options">
-      <select id="reverse">
+    <div id="clock-options" class="options">
+      <select class="reverse">
         <option>Normal</option>
         <option>Reverse</option>
       </select>
-      <select id="text">
+      <select class="labels">
         <option>Show Labels</option>
         <option>Hide Labels</option>
       </select>
-      <select id="percent">
+      <select class="percentage">
         <option>Show Percentage</option>
         <option>Hide Percentage</option>
       </select>
-    </div>
-    <div id="sliders">
+      <select class="label_color">
+        <option>Light labels</option>
+        <option>Dark labels</option>
+      </select>
       <label>
         Clock color:
         <input class="hue" type="range"  min="0" max="360" step="1" value="195"/>
       </label>
-      <label>
-        Label Color:
-        <input class="label_color" type="range"  min="0" max="100" step="1" value="90"/>
-      </label>
+    </div>
+    <div id="personal-options" class="options">
+      <select class="gender">
+        <option>Male</option>
+        <option>Female</option>
+      </select>
+      <select class="smoker">
+        <option>Non-Smoker</option>
+        <option>Smoker</option>
+      </select>
       <label>
         Age:
         <input class="age" type="number"  min="1" max="110" step="1" value="25"/>
       </label>
       <label>
+        <a target="_blank" href="http://www.cdc.gov/healthyweight/assessing/bmi/adult_bmi/english_bmi_calculator/bmi_calculator.html">BMI:</a>
+        <input class="bmi" type="number"  min="10" max="60" step="1" value="25"/>
+      </label>
+      <label>
         Life Expectancy:
-        <input class="expectancy" type="number"  min="1" max="110" step="1" value="85"/>
+        <span class="expectancy output"></span>
       </label>
     </div>
-    <canvas id="clock" width=1024 height=768></canvas>
+    <canvas id="clock" width=1000 height=1000></canvas>
     <script type="text/javascript">$(document).ready(function(){clock.initialize()});</script>
   </body>
 </html>
