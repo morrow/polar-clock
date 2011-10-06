@@ -1,20 +1,20 @@
 clock = 
 
-  contexts: ["minute", "hour", "day", "week", "month", "year", "decade", "life"]
-  
   config:
-    age:          25
-    gender:       "male"
-    bmi:          25
-    expectancy:   75
-    hue:          195
-    lightlabels:  true
-    smoker:       false
-    reverse:      false
-    show_labels:       true
-    show_percentage:   true
-    grid:         true
-    line_width:   50
+    age:              25
+    gender:           "male"
+    bmi:              25
+    expectancy:       75
+    hue:              195
+    lightlabels:      true
+    smoker:           false
+    reverse:          false
+    show_labels:      true
+    show_percentage:  true
+    show_grid:        true
+    line_width:       50
+
+  contexts: ["minute", "hour", "day", "week", "month", "year", "decade", "life"]
   
   radii: []
   
@@ -36,8 +36,6 @@ clock =
         clock.config[$(this)[0].className] = Math.max(Math.min($(this).val(), $(this).attr("max")), $(this).attr("min"))
       else if $(this).attr("type") is "checkbox"
         clock.config[$(this)[0].className] = $(this).attr("checked") is "checked"
-        console.log $(this)
-        console.log clock.config[$(this)[0].className]
       clock.setRadii()
       clock.saveConfig()
     $("#personal-options").delegate "input, select", "change click keyup blur", ->
@@ -88,8 +86,6 @@ clock =
           $(".#{item}")[0].checked = !!clock.config[item]
         else
           $(".#{item}").val(clock.config[item])
-      else
-         console.log item
 
   saveConfig:->
     window.localStorage["config"] = JSON.stringify clock.config
@@ -133,7 +129,7 @@ clock =
       @ctx.fillText(text, @canvas.width/2+offset, @canvas.height/2-@radii[item]+offset) if text
 
   drawGrid:->
-    return false if not @config.grid
+    return false if not @config.show_grid
     @ctx.beginPath()
     @ctx.lineWidth = 1
     @ctx.strokeStyle = "black"

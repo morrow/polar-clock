@@ -1,6 +1,5 @@
 var clock;
 clock = {
-  contexts: ["minute", "hour", "day", "week", "month", "year", "decade", "life"],
   config: {
     age: 25,
     gender: "male",
@@ -12,9 +11,10 @@ clock = {
     reverse: false,
     show_labels: true,
     show_percentage: true,
-    grid: true,
+    show_grid: true,
     line_width: 50
   },
+  contexts: ["minute", "hour", "day", "week", "month", "year", "decade", "life"],
   radii: [],
   styles: {},
   initialize: function() {
@@ -36,8 +36,6 @@ clock = {
         clock.config[$(this)[0].className] = Math.max(Math.min($(this).val(), $(this).attr("max")), $(this).attr("min"));
       } else if ($(this).attr("type") === "checkbox") {
         clock.config[$(this)[0].className] = $(this).attr("checked") === "checked";
-        console.log($(this));
-        console.log(clock.config[$(this)[0].className]);
       }
       clock.setRadii();
       return clock.saveConfig();
@@ -102,7 +100,7 @@ clock = {
     }
     _results = [];
     for (item in clock.config) {
-      _results.push($("." + item).length ? $("." + item).attr("type") === "checkbox" ? $("." + item)[0].checked = !!clock.config[item] : $("." + item).val(clock.config[item]) : console.log(item));
+      _results.push($("." + item).length ? $("." + item).attr("type") === "checkbox" ? $("." + item)[0].checked = !!clock.config[item] : $("." + item).val(clock.config[item]) : void 0);
     }
     return _results;
   },
@@ -171,7 +169,7 @@ clock = {
     return _results;
   },
   drawGrid: function() {
-    if (!this.config.grid) {
+    if (!this.config.show_grid) {
       return false;
     }
     this.ctx.beginPath();
