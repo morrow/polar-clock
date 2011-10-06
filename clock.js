@@ -62,9 +62,11 @@ clock = {
   },
   calculateExpectancy: function() {
     var age, birthday, bmi, current, expectancy, gender, smoker;
-    current = new Date();
-    birthday = new Date(clock.config.birthday);
-    clock.config.age = (current.getTime() - birthday.getTime()) / 86400000 / 365;
+    if ($(".birthday").val()) {
+      current = new Date();
+      birthday = new Date(clock.config.birthday);
+      clock.config.age = (current.getTime() - birthday.getTime()) / 86400000 / 365;
+    }
     age = clock.config.age;
     bmi = clock.config.bmi;
     gender = clock.config.gender;

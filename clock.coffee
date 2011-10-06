@@ -56,9 +56,10 @@ clock =
 
   calculateExpectancy:->
     # http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2662372/?tool=pmcentrez
-    current = new Date()
-    birthday = new Date(clock.config.birthday)
-    clock.config.age = (current.getTime() - birthday.getTime()) / 86400000 / 365
+    if $(".birthday").val()
+      current = new Date()
+      birthday = new Date(clock.config.birthday)
+      clock.config.age = (current.getTime() - birthday.getTime()) / 86400000 / 365
     age = clock.config.age
     bmi = clock.config.bmi
     gender = clock.config.gender
