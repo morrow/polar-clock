@@ -129,14 +129,17 @@ clock =
       @ctx.fillText(text, @canvas.width/2+offset, @canvas.height/2-@radii[item]+offset) if text
 
   drawGrid:->
-    return false if not @config.show_grid
     @ctx.beginPath()
     @ctx.lineWidth = 1
     @ctx.strokeStyle = "black"
-    @ctx.moveTo(@canvas.width/2, 0)
-    @ctx.lineTo(@canvas.width/2, @canvas.height)
-    @ctx.moveTo(0, @canvas.height/2)
-    @ctx.lineTo(@canvas.width, @canvas.height/2)
+    if @config.show_grid
+      @ctx.moveTo(@canvas.width/2, 0)
+      @ctx.lineTo(@canvas.width/2, @canvas.height)
+      @ctx.moveTo(0, @canvas.height/2)
+      @ctx.lineTo(@canvas.width, @canvas.height/2)
+    else
+      @ctx.moveTo(@canvas.width/2, 0)
+      @ctx.lineTo(@canvas.width/2, @canvas.height/2)
     @ctx.stroke()
     @ctx.closePath()
 
