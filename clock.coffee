@@ -1,6 +1,6 @@
 clock = 
 
-  contexts: ["minute", "hour", "day", "week", "month", "year", "decade", "life"] 
+  contexts: ["minute", "hour", "day", "week", "month", "year", "decade", "life"]
   
   config:
     age:          25
@@ -11,8 +11,8 @@ clock =
     lightlabels:  true
     smoker:       false
     reverse:      false
-    labels:       true
-    percentage:   true
+    show_labels:       true
+    show_percentage:   true
     grid:         true
     line_width:   50
   
@@ -23,27 +23,32 @@ clock =
   initialize:->
     @canvas = $("#clock")[0]
     @ctx = @canvas.getContext("2d")
+    $("#options-toggle").live "click", (e)->
+      $("#options").toggle()
+    $("body").live "click", (e)->
+      if e.target.nodeName.toLowerCase().match /canvas|button/
+        $("#options").hide()
     @loadConfig()
     @setRadii()
     @calculateExpectancy()
-    $(".options").live("mouseover", ()-> $(".options").addClass("hovered"))
-    $("#clock").live("mouseover", ()-> $(".options").removeClass("hovered"))
-    $("#clock-options select").live "change click keyup blur", ->
-      option = $(this).val().toLowerCase()
-      clock.config[option.replace(' ', '').replace(/hide|show/, '').replace('normal', 'reverse').replace('dark','light')] = !option.match(/hide|normal|dark/)
-      clock.setRadii() if option.match(/reverse|normal/)
-    $("[input[type=range]").live "change click keyup blur", ->
-      clock.config[$(this)[0].className] = Math.max(Math.min($(this).val(), $(this).attr("max")), $(this).attr("min"))
+    $("#clock-options input").live "change", ->
+      if $(this).attr("type") is "range"
+        clock.config[$(this)[0].className] = Math.max(Math.min($(this).val(), $(this).attr("max")), $(this).attr("min"))
+      else if $(this).attr("type") is "checkbox"
+        clock.config[$(this)[0].className] = $(this).attr("checked") is "checked"
+        console.log $(this)
+        console.log clock.config[$(this)[0].className]
       clock.setRadii()
       clock.saveConfig()
     $("#personal-options").delegate "input, select", "change click keyup blur", ->
-      console.log $(this)[0].className
-      console.log $(this).val().toLowerCase()
       value = $(this).val().toLowerCase()
       if $(this)[0].className.match /gender|bmi|age/
         clock.config[$(this)[0].className] = value
       else if $(this)[0].className.match /smoker/
-        clock.config["smoker"] = !value.match(/non-smoker/)
+        clock.config["smoker"] = !!$(this).attr("checked")
+      else if $(this)[0].className.match /birthday/
+        if $(".birthday").val()
+          clock.config.birthday = $(".birthday").val()
       clock.calculateExpectancy()
       clock.saveConfig()
     window.setInterval('clock.setTime("all")', 1000)
@@ -51,6 +56,9 @@ clock =
 
   calculateExpectancy:->
     # http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2662372/?tool=pmcentrez
+    current = new Date()
+    birthday = new Date(clock.config.birthday)
+    clock.config.age = (current.getTime() - birthday.getTime()) / 86400000 / 365
     age = clock.config.age
     bmi = clock.config.bmi
     gender = clock.config.gender
@@ -62,18 +70,25 @@ clock =
       expectancy -= Math.min(bmi - 25, (bmi-25)/2)
     if smoker
       expectancy -= 10
-    console.log expectancy
-    $(".expectancy.output").text(clock.config.expectancy = Math.round(expectancy))
+    $(".expectancy.output").text(clock.config.expectancy = parseInt(expectancy))
+    $(".age.output").text(parseInt(clock.config.age * 100)/100)
 
   loadConfig:->
     try
       config = JSON.parse window.localStorage["config"] if window.localStorage["config"] 
     catch error
       config = false
-    clock.config = config if typeof config is "object"
+    if typeof config is "object"
+      clock.config = config 
+      $("#options").hide()
     for item of clock.config
       if $(".#{item}").length
-        $(".#{item}").val(clock.config[item])
+        if $(".#{item}").attr("type") is "checkbox"
+          $(".#{item}")[0].checked = !!clock.config[item]
+        else
+          $(".#{item}").val(clock.config[item])
+      else
+         console.log item
 
   saveConfig:->
     window.localStorage["config"] = JSON.stringify clock.config
@@ -101,7 +116,7 @@ clock =
     @ctx.closePath()
 
 
-  drawText:->
+  drawText:(context="all")->
     @ctx.font = "bold 13px arial"
     offset = 5
     for item of @radii
@@ -111,16 +126,16 @@ clock =
       else
         @ctx.fillStyle = "black"
       text = ""
-      text = item if @config.labels
-      text += " - " if @config.labels and @config.percentage
-      text += "#{Math.round(clock[item]/60*100)}%" if @config.percentage
+      text = item if @config.show_labels
+      text += " - " if @config.show_labels and @config.show_percentage
+      text += "#{parseInt(clock[item]/60*100)}%" if @config.show_percentage
       @ctx.fillText(text, @canvas.width/2+offset, @canvas.height/2-@radii[item]+offset) if text
 
   drawGrid:->
     return false if not @config.grid
     @ctx.beginPath()
     @ctx.lineWidth = 1
-    @ctx.strokeStyle = "rgba(0,0,0,.4)"
+    @ctx.strokeStyle = "black"
     @ctx.moveTo(@canvas.width/2, 0)
     @ctx.lineTo(@canvas.width/2, @canvas.height)
     @ctx.moveTo(0, @canvas.height/2)
@@ -128,15 +143,15 @@ clock =
     @ctx.stroke()
     @ctx.closePath()
 
-  drawClock:(context="all")->  
+  drawClock:(context="all")-> 
     @ctx.fillStyle = "black"
-    @ctx.fillRect(0,0,@canvas.width, @canvas.height)
+    @ctx.fillRect(0, 0, @canvas.width, @canvas.height)
     for item in @contexts
-      if context is item or "all"
+      if item is context or "all"
         @draw(clock[item], item)
-    @drawText(context)
+    @minute = 0 if @minute > 60
     @drawGrid()
-    @minute = 0 if @minute >= 60
+    @drawText(context)
 
   setTime:(context="all")->
     d = (new Date())

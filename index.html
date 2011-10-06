@@ -6,51 +6,43 @@
     <link rel="stylesheet" href="screen.css" />
   </head>
   <body>
-    <div id="clock-options" class="options">
-      <select class="reverse">
-        <option>Normal</option>
-        <option>Reverse</option>
-      </select>
-      <select class="labels">
-        <option>Show Labels</option>
-        <option>Hide Labels</option>
-      </select>
-      <select class="percentage">
-        <option>Show Percentage</option>
-        <option>Hide Percentage</option>
-      </select>
-      <select class="label_color">
-        <option>Light labels</option>
-        <option>Dark labels</option>
-      </select>
-      <label>
-        Clock color:
-        <input class="hue" type="range"  min="0" max="360" step="1" value="195"/>
-      </label>
-    </div>
-    <div id="personal-options" class="options">
-      <select class="gender">
-        <option>Male</option>
-        <option>Female</option>
-      </select>
-      <select class="smoker">
-        <option>Non-Smoker</option>
-        <option>Smoker</option>
-      </select>
-      <label>
-        Age:
-        <input class="age" type="number"  min="1" max="110" step="1" value="25"/>
-      </label>
-      <label>
-        <a target="_blank" href="http://www.cdc.gov/healthyweight/assessing/bmi/adult_bmi/english_bmi_calculator/bmi_calculator.html">BMI:</a>
-        <input class="bmi" type="number"  min="10" max="60" step="1" value="25"/>
-      </label>
-      <label>
-        Life Expectancy:
-        <span class="expectancy output"></span>
-      </label>
-    </div>
     <canvas id="clock" width=1000 height=1000></canvas>
+    <div id="options-toggle">settings</div>
+    <div id="options" visibility="none">
+      <a href="https://github.com/morrow/Life-Clock"> Life Clock </a>
+      <div id="clock-options" class="options">
+        <label> Reverse format: </label>
+        <input class="reverse" type="checkbox" />
+        <label> Show Labels: </label>
+        <input class="show_labels" type="checkbox" />
+        <label> Show Percentages: </label>
+        <input class="show_percentage" type="checkbox" />
+        <label> Light text: </label>        
+        <input class="lightlabels" type="checkbox" />
+        <label> Clock color:</label>
+        <input class="hue" type="range"  min="0" max="360" step="1" value="195"/>
+      </div>
+      <div id="personal-options" class="options">
+        <label> Gender: </label>        
+        <select class="gender">
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+        </select>
+        <label> Smoker: </label>        
+        <input class="smoker" type="checkbox" />
+        <label> Birthday: </label>
+        <input class="birthday" type="text" />
+        <label>
+          <a target="_blank" href="http://www.cdc.gov/healthyweight/assessing/bmi/adult_bmi/english_bmi_calculator/bmi_calculator.html">BMI:</a>
+        </label>
+        <input class="bmi" type="number"  min="10" max="60" step="1" value="25"/>
+        <label> Age: </label>
+        <span class="age output"></span>
+        <label> Life Expectancy: </label>
+        <span class="expectancy output"></span>
+      </div>
+      <button id="okay">okay</button>
+    </div>
     <script type="text/javascript">$(document).ready(function(){clock.initialize()});</script>
   </body>
 </html>

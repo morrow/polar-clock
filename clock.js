@@ -10,8 +10,8 @@ clock = {
     lightlabels: true,
     smoker: false,
     reverse: false,
-    labels: true,
-    percentage: true,
+    show_labels: true,
+    show_percentage: true,
     grid: true,
     line_width: 50
   },
@@ -20,37 +20,39 @@ clock = {
   initialize: function() {
     this.canvas = $("#clock")[0];
     this.ctx = this.canvas.getContext("2d");
+    $("#options-toggle").live("click", function(e) {
+      return $("#options").toggle();
+    });
+    $("body").live("click", function(e) {
+      if (e.target.nodeName.toLowerCase().match(/canvas|button/)) {
+        return $("#options").hide();
+      }
+    });
     this.loadConfig();
     this.setRadii();
     this.calculateExpectancy();
-    $(".options").live("mouseover", function() {
-      return $(".options").addClass("hovered");
-    });
-    $("#clock").live("mouseover", function() {
-      return $(".options").removeClass("hovered");
-    });
-    $("#clock-options select").live("change click keyup blur", function() {
-      var option;
-      option = $(this).val().toLowerCase();
-      clock.config[option.replace(' ', '').replace(/hide|show/, '').replace('normal', 'reverse').replace('dark', 'light')] = !option.match(/hide|normal|dark/);
-      if (option.match(/reverse|normal/)) {
-        return clock.setRadii();
+    $("#clock-options input").live("change", function() {
+      if ($(this).attr("type") === "range") {
+        clock.config[$(this)[0].className] = Math.max(Math.min($(this).val(), $(this).attr("max")), $(this).attr("min"));
+      } else if ($(this).attr("type") === "checkbox") {
+        clock.config[$(this)[0].className] = $(this).attr("checked") === "checked";
+        console.log($(this));
+        console.log(clock.config[$(this)[0].className]);
       }
-    });
-    $("[input[type=range]").live("change click keyup blur", function() {
-      clock.config[$(this)[0].className] = Math.max(Math.min($(this).val(), $(this).attr("max")), $(this).attr("min"));
       clock.setRadii();
       return clock.saveConfig();
     });
     $("#personal-options").delegate("input, select", "change click keyup blur", function() {
       var value;
-      console.log($(this)[0].className);
-      console.log($(this).val().toLowerCase());
       value = $(this).val().toLowerCase();
       if ($(this)[0].className.match(/gender|bmi|age/)) {
         clock.config[$(this)[0].className] = value;
       } else if ($(this)[0].className.match(/smoker/)) {
-        clock.config["smoker"] = !value.match(/non-smoker/);
+        clock.config["smoker"] = !!$(this).attr("checked");
+      } else if ($(this)[0].className.match(/birthday/)) {
+        if ($(".birthday").val()) {
+          clock.config.birthday = $(".birthday").val();
+        }
       }
       clock.calculateExpectancy();
       return clock.saveConfig();
@@ -59,7 +61,10 @@ clock = {
     return window.setInterval('clock.setTime("minute")', 50);
   },
   calculateExpectancy: function() {
-    var age, bmi, expectancy, gender, smoker;
+    var age, birthday, bmi, current, expectancy, gender, smoker;
+    current = new Date();
+    birthday = new Date(clock.config.birthday);
+    clock.config.age = (current.getTime() - birthday.getTime()) / 86400000 / 365;
     age = clock.config.age;
     bmi = clock.config.bmi;
     gender = clock.config.gender;
@@ -77,8 +82,8 @@ clock = {
     if (smoker) {
       expectancy -= 10;
     }
-    console.log(expectancy);
-    return $(".expectancy.output").text(clock.config.expectancy = Math.round(expectancy));
+    $(".expectancy.output").text(clock.config.expectancy = parseInt(expectancy));
+    return $(".age.output").text(parseInt(clock.config.age * 100) / 100);
   },
   loadConfig: function() {
     var config, item, _results;
@@ -91,10 +96,11 @@ clock = {
     }
     if (typeof config === "object") {
       clock.config = config;
+      $("#options").hide();
     }
     _results = [];
     for (item in clock.config) {
-      _results.push($("." + item).length ? $("." + item).val(clock.config[item]) : void 0);
+      _results.push($("." + item).length ? $("." + item).attr("type") === "checkbox" ? $("." + item)[0].checked = !!clock.config[item] : $("." + item).val(clock.config[item]) : console.log(item));
     }
     return _results;
   },
@@ -133,8 +139,11 @@ clock = {
     this.ctx.stroke();
     return this.ctx.closePath();
   },
-  drawText: function() {
+  drawText: function(context) {
     var item, offset, percent, text, _results;
+    if (context == null) {
+      context = "all";
+    }
     this.ctx.font = "bold 13px arial";
     offset = 5;
     _results = [];
@@ -146,14 +155,14 @@ clock = {
         this.ctx.fillStyle = "black";
       }
       text = "";
-      if (this.config.labels) {
+      if (this.config.show_labels) {
         text = item;
       }
-      if (this.config.labels && this.config.percentage) {
+      if (this.config.show_labels && this.config.show_percentage) {
         text += " - ";
       }
-      if (this.config.percentage) {
-        text += "" + (Math.round(clock[item] / 60 * 100)) + "%";
+      if (this.config.show_percentage) {
+        text += "" + (parseInt(clock[item] / 60 * 100)) + "%";
       }
       _results.push(text ? this.ctx.fillText(text, this.canvas.width / 2 + offset, this.canvas.height / 2 - this.radii[item] + offset) : void 0);
     }
@@ -165,7 +174,7 @@ clock = {
     }
     this.ctx.beginPath();
     this.ctx.lineWidth = 1;
-    this.ctx.strokeStyle = "rgba(0,0,0,.4)";
+    this.ctx.strokeStyle = "black";
     this.ctx.moveTo(this.canvas.width / 2, 0);
     this.ctx.lineTo(this.canvas.width / 2, this.canvas.height);
     this.ctx.moveTo(0, this.canvas.height / 2);
@@ -183,15 +192,15 @@ clock = {
     _ref = this.contexts;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       item = _ref[_i];
-      if (context === item || "all") {
+      if (item === context || "all") {
         this.draw(clock[item], item);
       }
     }
-    this.drawText(context);
-    this.drawGrid();
-    if (this.minute >= 60) {
-      return this.minute = 0;
+    if (this.minute > 60) {
+      this.minute = 0;
     }
+    this.drawGrid();
+    return this.drawText(context);
   },
   setTime: function(context) {
     var d, d2;
