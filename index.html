@@ -23,10 +23,21 @@
         <input class="show_grid" type="checkbox" />
         <label> Rotate Clock: </label>
         <input class="rotate" type="checkbox" />
-        <label> Light text: </label>
-        <input class="lightlabels" type="checkbox" />
+        <label> Rotate Around: </label>        
+        <select class="rotate_context">
+          <option value="minute">Minute</option>
+          <option value="hour">Hour</option>
+          <option value="day">Day</option>
+          <option value="week">Week</option>
+          <option value="month">Month</option>
+          <option value="year">Year</option>
+          <option value="decade">Decade</option>
+          <option value="life">Life</option>
+        </select>
         <label> Clock color:</label>
         <input class="hue" type="range"  min="0" max="360" step="1" value="195"/>
+        <label> Light text: </label>
+        <input class="lightlabels" type="checkbox" />
       </div>
       <div id="personal-options" class="options">
         <label> Gender: </label>        

@@ -33,11 +33,15 @@ clock = {
     this.loadConfig();
     this.setRadii();
     this.calculateExpectancy();
-    $("#clock-options input").live("change", function() {
+    $("#clock-options").delegate("input, select", "change click keyup blur", function() {
       if ($(this).attr("type") === "range") {
         clock.config[$(this)[0].className] = Math.max(Math.min($(this).val(), $(this).attr("max")), $(this).attr("min"));
       } else if ($(this).attr("type") === "checkbox") {
         clock.config[$(this)[0].className] = $(this).attr("checked") === "checked";
+      } else if ($(this)[0].nodeName.toLowerCase() === "select") {
+        console.log($(this));
+        console.log($(this).val());
+        clock.config[$(this)[0].className] = $(this).val();
       }
       clock.setRadii();
       return clock.saveConfig();

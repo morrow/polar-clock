@@ -33,11 +33,15 @@ clock =
     @loadConfig()
     @setRadii()
     @calculateExpectancy()
-    $("#clock-options input").live "change", ->
+    $("#clock-options").delegate "input, select", "change click keyup blur", ->
       if $(this).attr("type") is "range"
         clock.config[$(this)[0].className] = Math.max(Math.min($(this).val(), $(this).attr("max")), $(this).attr("min"))
       else if $(this).attr("type") is "checkbox"
         clock.config[$(this)[0].className] = $(this).attr("checked") is "checked"
+      else if $(this)[0].nodeName.toLowerCase() is "select"
+        console.log $(this)
+        console.log $(this).val()
+        clock.config[$(this)[0].className] = $(this).val()
       clock.setRadii()
       clock.saveConfig()
     $("#personal-options").delegate "input, select", "change click keyup blur", ->
