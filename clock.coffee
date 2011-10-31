@@ -153,10 +153,12 @@ clock =
     if not @config.rotate
       $("#clock").css
         "-webkit-transform":"rotate(0deg)"
+        "-moz-transform":"rotate(0deg)"
       return false
     rotate = -(clock[@config.rotate_context]*6)
     $("#clock").css
       "-webkit-transform":"rotate(#{rotate}deg)"
+      "-moz-transform":"rotate(#{rotate}deg)"
 
   drawClock:(context="all")-> 
     @ctx.fillStyle = "black"
