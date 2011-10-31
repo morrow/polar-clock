@@ -215,13 +215,13 @@ clock = {
       this.minute = d.getSeconds() + (parseInt(d.getTime() / 10) % parseInt(d.getTime() / 1000)) / 100;
     }
     if (context === "hour" || "all") {
-      this.hour = d.getMinutes() + (this.minute / 60);
+      this.hour = d.getMinutes() - (this.minute / 60);
     }
     if (context === "day" || "all") {
-      this.day = (d.getHours() + (this.hour / 60)) / 24 * 60;
+      this.day = (d.getHours() - (this.hour / 60)) / 24 * 60;
     }
     if (context === "week" || "all") {
-      this.week = ((d.getDay() + d.getHours() / 24) / 7) * 60;
+      this.week = ((d.getDay() - d.getHours() / 24) / 7) * 60;
     }
     if (context === "month" || "all") {
       this.month = (d.getDate() / (32 - new Date(d.getYear(), d.getMonth(), 32).getDate())) * 60 - this.day / 60;

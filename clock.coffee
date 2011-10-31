@@ -159,11 +159,11 @@ clock =
     if context is "minute" or "all"
       @minute = d.getSeconds() + (parseInt(d.getTime() / 10) % parseInt(d.getTime() / 1000)) / 100
     if context is "hour" or "all"
-      @hour = d.getMinutes() + (@minute / 60)
+      @hour = d.getMinutes() - (@minute / 60)
     if context is "day" or "all"
-      @day = (d.getHours() + (@hour / 60)) / 24 * 60
+      @day = (d.getHours() - (@hour / 60)) / 24 * 60
     if context is "week" or "all"
-      @week = ((d.getDay() + d.getHours() / 24) / 7) * 60
+      @week = ((d.getDay() - d.getHours() / 24) / 7) * 60
     if context is "month" or "all"
       @month = (d.getDate() / (32 - new Date(d.getYear(), d.getMonth(), 32).getDate())) * 60 - @day/60
     if context is "year" or "all"
