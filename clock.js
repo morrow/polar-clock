@@ -12,7 +12,7 @@ clock = {
     rotate: false,
     rotate_context: "minute",
     show_labels: true,
-    show_percentage: true,
+    show_percentage: false,
     show_grid: true,
     line_width: 50
   },
