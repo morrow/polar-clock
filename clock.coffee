@@ -149,11 +149,13 @@ clock =
 
   rotateClock:(context="all")->
     if not @config.rotate
+      $("body").removeClass "rotating"
       $("#clock").css
         "-webkit-transform":"rotate(0deg)"
         "-moz-transform":"rotate(0deg)"
       return false
     rotate = -(clock[@config.rotate_context]*6)
+    $("body").addClass "rotating"
     $("#clock").css
       "-webkit-transform":"rotate(#{rotate}deg)"
       "-moz-transform":"rotate(#{rotate}deg)"

@@ -194,6 +194,7 @@ clock = {
       context = "all";
     }
     if (!this.config.rotate) {
+      $("body").removeClass("rotating");
       $("#clock").css({
         "-webkit-transform": "rotate(0deg)",
         "-moz-transform": "rotate(0deg)"
@@ -201,6 +202,7 @@ clock = {
       return false;
     }
     rotate = -(clock[this.config.rotate_context] * 6);
+    $("body").addClass("rotating");
     return $("#clock").css({
       "-webkit-transform": "rotate(" + rotate + "deg)",
       "-moz-transform": "rotate(" + rotate + "deg)"
