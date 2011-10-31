@@ -9,6 +9,8 @@ clock = {
     lightlabels: true,
     smoker: false,
     reverse: false,
+    rotate: false,
+    rotate_context: "minute",
     show_labels: true,
     show_percentage: true,
     show_grid: true,
@@ -171,7 +173,7 @@ clock = {
   drawGrid: function() {
     this.ctx.beginPath();
     this.ctx.lineWidth = 1;
-    this.ctx.strokeStyle = "black";
+    this.ctx.strokeStyle = "rgba(0,0,0,.5)";
     if (this.config.show_grid) {
       this.ctx.moveTo(this.canvas.width / 2, 0);
       this.ctx.lineTo(this.canvas.width / 2, this.canvas.height);
@@ -183,6 +185,22 @@ clock = {
     }
     this.ctx.stroke();
     return this.ctx.closePath();
+  },
+  rotateClock: function(context) {
+    var rotate;
+    if (context == null) {
+      context = "all";
+    }
+    if (!this.config.rotate) {
+      $("#clock").css({
+        "-webkit-transform": "rotate(0deg)"
+      });
+      return false;
+    }
+    rotate = -(clock[this.config.rotate_context] * 6);
+    return $("#clock").css({
+      "-webkit-transform": "rotate(" + rotate + "deg)"
+    });
   },
   drawClock: function(context) {
     var item, _i, _len, _ref;
@@ -201,8 +219,9 @@ clock = {
     if (this.minute > 60) {
       this.minute = 0;
     }
-    this.drawGrid();
-    return this.drawText(context);
+    this.drawGrid(context);
+    this.drawText(context);
+    return this.rotateClock(context);
   },
   setTime: function(context) {
     var d, d2;

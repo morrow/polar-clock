@@ -9,6 +9,8 @@ clock =
     lightlabels:      true
     smoker:           false
     reverse:          false
+    rotate:           false
+    rotate_context:   "minute"
     show_labels:      true
     show_percentage:  true
     show_grid:        true
@@ -131,7 +133,7 @@ clock =
   drawGrid:->
     @ctx.beginPath()
     @ctx.lineWidth = 1
-    @ctx.strokeStyle = "black"
+    @ctx.strokeStyle = "rgba(0,0,0,.5)"
     if @config.show_grid
       @ctx.moveTo(@canvas.width/2, 0)
       @ctx.lineTo(@canvas.width/2, @canvas.height)
@@ -143,6 +145,15 @@ clock =
     @ctx.stroke()
     @ctx.closePath()
 
+  rotateClock:(context="all")->
+    if not @config.rotate
+      $("#clock").css
+        "-webkit-transform":"rotate(0deg)"
+      return false
+    rotate = -(clock[@config.rotate_context]*6)
+    $("#clock").css
+      "-webkit-transform":"rotate(#{rotate}deg)"
+
   drawClock:(context="all")-> 
     @ctx.fillStyle = "black"
     @ctx.fillRect(0, 0, @canvas.width, @canvas.height)
@@ -150,8 +161,9 @@ clock =
       if item is context or "all"
         @draw(clock[item], item)
     @minute = 0 if @minute > 60
-    @drawGrid()
+    @drawGrid(context)
     @drawText(context)
+    @rotateClock(context)
 
   setTime:(context="all")->
     d = (new Date())
