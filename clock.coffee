@@ -39,8 +39,6 @@ clock =
       else if $(this).attr("type") is "checkbox"
         clock.config[$(this)[0].className] = $(this).attr("checked") is "checked"
       else if $(this)[0].nodeName.toLowerCase() is "select"
-        console.log $(this)
-        console.log $(this).val()
         clock.config[$(this)[0].className] = $(this).val()
       clock.setRadii()
       clock.saveConfig()
