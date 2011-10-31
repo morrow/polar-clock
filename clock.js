@@ -247,7 +247,7 @@ clock = {
       this.week = ((d.getDay() - d.getHours() / 24) / 7) * 60;
     }
     if (context === "month" || "all") {
-      this.month = (d.getDate() / (32 - new Date(d.getYear(), d.getMonth(), 32).getDate())) * 60 - this.day / 60;
+      this.month = (d.getDate() / (32 - new Date(d.getYear(), d.getMonth(), 32).getDate())) * 60 - (1 - this.day / 60);
     }
     if (context === "year" || "all") {
       this.year = (Math.ceil((d - d2) / 86400000) + this.day / 60) / 365 * 60;

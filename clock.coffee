@@ -181,7 +181,7 @@ clock =
     if context is "week" or "all"
       @week = ((d.getDay() - d.getHours() / 24) / 7) * 60
     if context is "month" or "all"
-      @month = (d.getDate() / (32 - new Date(d.getYear(), d.getMonth(), 32).getDate())) * 60 - @day/60
+      @month = (d.getDate() / (32 - new Date(d.getYear(), d.getMonth(), 32).getDate())) * 60 - (1 - @day/60)
     if context is "year" or "all"
       @year = (Math.ceil((d - d2) / 86400000) + @day / 60) / 365 * 60
     if context is "decade" or "all"
