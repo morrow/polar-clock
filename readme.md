@@ -8,4 +8,4 @@ to allow for more time contexts at either end of the scale (watch microseconds f
 
 Also would like to better represent future time periods (the clock simply doesn't draw there now) - maybe offer a visualiaztion of the level of uncertainty of an event timeframe?  Another possibility would be to add scheduled events and display them in the space of the ring.
 
-I'm sure there are bugs with the code - this is more of a hack to see what it would look like than an attempt at making something releasable.
+There are probably bugs - this was just a quick project to see what this type of clock would look like.
