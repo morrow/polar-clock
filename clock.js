@@ -39,8 +39,6 @@ clock = {
       } else if ($(this).attr("type") === "checkbox") {
         clock.config[$(this)[0].className] = $(this).attr("checked") === "checked";
       } else if ($(this)[0].nodeName.toLowerCase() === "select") {
-        console.log($(this));
-        console.log($(this).val());
         clock.config[$(this)[0].className] = $(this).val();
       }
       clock.setRadii();
@@ -197,13 +195,15 @@ clock = {
     }
     if (!this.config.rotate) {
       $("#clock").css({
-        "-webkit-transform": "rotate(0deg)"
+        "-webkit-transform": "rotate(0deg)",
+        "-moz-transform": "rotate(0deg)"
       });
       return false;
     }
     rotate = -(clock[this.config.rotate_context] * 6);
     return $("#clock").css({
-      "-webkit-transform": "rotate(" + rotate + "deg)"
+      "-webkit-transform": "rotate(" + rotate + "deg)",
+      "-moz-transform": "rotate(" + rotate + "deg)"
     });
   },
   drawClock: function(context) {
