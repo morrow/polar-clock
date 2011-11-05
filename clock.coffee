@@ -17,7 +17,7 @@ clock =
     line_width:       50
 
   #contexts: ["minute", "hour", "day", "week", "month", "year", "decade", "life", "century", "millenium", "earth"] #arbitrary times included
-  contexts: ["minute", "hour", "day", "week", "month", "year", "life", "earth"]
+  contexts: ["second", "minute", "hour", "day", "week", "month", "year", "life", "earth"]
   
   radii: []
   
@@ -175,6 +175,8 @@ clock =
   setTime:(context="all")->
     d = (new Date())
     d2 = new Date(d.getFullYear(), 0, 1)
+    if context is "second" or "all"
+      @second = ((new Date()).getMilliseconds() / 1000) * 60
     if context is "minute" or "all"
       @minute = d.getSeconds() + (parseInt(d.getTime() / 10) % parseInt(d.getTime() / 1000)) / 100
     if context is "hour" or "all"

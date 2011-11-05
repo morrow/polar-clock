@@ -16,7 +16,7 @@ clock = {
     show_grid: true,
     line_width: 50
   },
-  contexts: ["minute", "hour", "day", "week", "month", "year", "life", "earth"],
+  contexts: ["second", "minute", "hour", "day", "week", "month", "year", "life", "earth"],
   radii: [],
   styles: {},
   initialize: function() {
@@ -236,6 +236,9 @@ clock = {
     }
     d = new Date();
     d2 = new Date(d.getFullYear(), 0, 1);
+    if (context === "second" || "all") {
+      this.second = ((new Date()).getMilliseconds() / 1000) * 60;
+    }
     if (context === "minute" || "all") {
       this.minute = d.getSeconds() + (parseInt(d.getTime() / 10) % parseInt(d.getTime() / 1000)) / 100;
     }
