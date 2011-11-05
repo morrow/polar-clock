@@ -16,7 +16,7 @@ clock = {
     show_grid: true,
     line_width: 50
   },
-  contexts: ["minute", "hour", "day", "week", "month", "year", "decade", "life"],
+  contexts: ["minute", "hour", "day", "week", "month", "year", "decade", "life", "century", "millenium", "earth"],
   radii: [],
   styles: {},
   initialize: function() {
@@ -262,6 +262,15 @@ clock = {
       if (this.life === 60) {
         $(".age").val(this.config.age = 1);
       }
+    }
+    if (context === "century" || "all") {
+      this.century = (new Date()).getFullYear() % 100;
+    }
+    if (context === "millenium" || "all") {
+      this.millenium = (new Date()).getFullYear() % 1000;
+    }
+    if (context === "earth" || "all") {
+      this.earth = (4570000000 + (new Date()).getTime()) / 10000000000;
     }
     return this.drawClock(context);
   }

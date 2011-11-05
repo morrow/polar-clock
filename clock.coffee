@@ -16,7 +16,7 @@ clock =
     show_grid:        true
     line_width:       50
 
-  contexts: ["minute", "hour", "day", "week", "month", "year", "decade", "life"]
+  contexts: ["minute", "hour", "day", "week", "month", "year", "decade", "life", "century", "millenium", "earth"]
   
   radii: []
   
@@ -191,4 +191,10 @@ clock =
     if context is "life" or "all"
       @life = ((clock.config.age*365*24 + (Math.ceil((d - d2) / 86400000)) + @hour / 60)  / (clock.config.expectancy*365*24)) * 60
       $(".age").val(@config.age=1) if @life == 60
+    if context is "century" or "all"
+      @century = (new Date()).getFullYear() % 100
+    if context is "millenium" or "all"
+      @millenium = (new Date()).getFullYear() % 1000
+    if context is "earth" or "all"
+      @earth = (4570000000 + (new Date()).getTime()) / 10000000000
     @drawClock(context)
