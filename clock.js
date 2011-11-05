@@ -16,7 +16,7 @@ clock = {
     show_grid: true,
     line_width: 50
   },
-  contexts: ["second", "minute", "hour", "day", "week", "month", "year", "life", "earth"],
+  contexts: ["minute", "hour", "day", "week", "month", "year", "life", "earth"],
   radii: [],
   styles: {},
   initialize: function() {

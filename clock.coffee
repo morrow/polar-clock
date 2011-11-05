@@ -16,8 +16,8 @@ clock =
     show_grid:        true
     line_width:       50
 
-  #contexts: ["minute", "hour", "day", "week", "month", "year", "decade", "life", "century", "millenium", "earth"] #arbitrary times included
-  contexts: ["second", "minute", "hour", "day", "week", "month", "year", "life", "earth"]
+  # available contexts: second minute hour day week month year decade life century millenium earth
+  contexts: ["minute", "hour", "day", "week", "month", "year", "life", "earth"]
   
   radii: []
   
