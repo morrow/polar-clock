@@ -264,13 +264,13 @@ clock = {
       }
     }
     if (context === "century" || "all") {
-      this.century = (new Date()).getFullYear() % 100;
+      this.century = (((new Date()).getFullYear() % 100) / 100) * 60;
     }
     if (context === "millenium" || "all") {
-      this.millenium = (new Date()).getFullYear() % 1000;
+      this.millenium = (((new Date()).getFullYear() % 1000) / 1000) * 60;
     }
     if (context === "earth" || "all") {
-      this.earth = (4570000000 + (new Date()).getTime()) / 10000000000;
+      this.earth = ((4570000000 + (new Date()).getTime() / 30000000000) / 10000000000) * 60;
     }
     return this.drawClock(context);
   }

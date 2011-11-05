@@ -192,9 +192,9 @@ clock =
       @life = ((clock.config.age*365*24 + (Math.ceil((d - d2) / 86400000)) + @hour / 60)  / (clock.config.expectancy*365*24)) * 60
       $(".age").val(@config.age=1) if @life == 60
     if context is "century" or "all"
-      @century = (new Date()).getFullYear() % 100
+      @century = (((new Date()).getFullYear() % 100) / 100) * 60
     if context is "millenium" or "all"
-      @millenium = (new Date()).getFullYear() % 1000
+      @millenium = (((new Date()).getFullYear() % 1000) / 1000) * 60
     if context is "earth" or "all"
-      @earth = (4570000000 + (new Date()).getTime()) / 10000000000
+      @earth = ((4570000000 + (new Date()).getTime() / 30000000000) / 10000000000) * 60
     @drawClock(context)
