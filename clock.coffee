@@ -17,7 +17,7 @@ clock =
     line_width:       50
 
   # available contexts: second minute hour day week month year decade life century millenium earth
-  contexts: ["minute", "hour", "day", "week", "month", "year", "life", "earth"]
+  contexts: ["minute", "hour", "day", "week", "month", "year", "life"]
   
   radii: []
   
@@ -132,6 +132,7 @@ clock =
       text += " - " if @config.show_labels and @config.show_percentage
       text += "#{parseInt(clock[item]/60*100)}%" if @config.show_percentage
       @ctx.fillText(text, @canvas.width/2+offset, @canvas.height/2-@radii[item]+offset) if text
+
 
   drawGrid:->
     @ctx.beginPath()
