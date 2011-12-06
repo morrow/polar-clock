@@ -49,21 +49,21 @@ Clock = (function() {
       clock.setRadii();
       return clock.saveConfig();
     });
-    $("#personal-options").delegate("input, select", "change click keyup blur", __bind(function() {
+    $("#personal-options").delegate("input, select", "change click keyup blur", function() {
       var value;
       value = $(this).val().toLowerCase();
       if ($(this)[0].className.match(/gender|bmi|age/)) {
-        this.config[$(this)[0].className] = value;
+        clock.config[$(this)[0].className] = value;
       } else if ($(this)[0].className.match(/smoker/)) {
-        this.config["smoker"] = !!$(this).attr("checked");
+        clock.config["smoker"] = !!$(this).attr("checked");
       } else if ($(this)[0].className.match(/birthday/)) {
         if ($(".birthday").val()) {
-          this.config.birthday = $(".birthday").val();
+          clock.config.birthday = $(".birthday").val();
         }
       }
-      this.calculateExpectancy();
-      return this.saveConfig();
-    }, this));
+      clock.calculateExpectancy();
+      return clock.saveConfig();
+    });
     this.setTime('all');
     window.setInterval((__bind(function() {
       this.setTime("all");
@@ -205,7 +205,7 @@ Clock = (function() {
     }
     clock.config.hue += .01;
     clock.setRadii();
-    if (clock.config.hue === 359) {
+    if (clock.config.hue >= 359.99) {
       return clock.config.hue = 0;
     }
   };

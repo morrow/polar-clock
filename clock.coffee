@@ -40,17 +40,17 @@ class Clock
         clock.config[$(this)[0].className] = $(this).val()
       clock.setRadii()
       clock.saveConfig()
-    $("#personal-options").delegate "input, select", "change click keyup blur", =>
+    $("#personal-options").delegate "input, select", "change click keyup blur", ->
       value = $(this).val().toLowerCase()
       if $(this)[0].className.match /gender|bmi|age/
-        @config[$(this)[0].className] = value
+        clock.config[$(this)[0].className] = value
       else if $(this)[0].className.match /smoker/
-        @config["smoker"] = !!$(this).attr("checked")
+        clock.config["smoker"] = !!$(this).attr("checked")
       else if $(this)[0].className.match /birthday/
         if $(".birthday").val()
-          @config.birthday = $(".birthday").val()
-      @calculateExpectancy()
-      @saveConfig()
+          clock.config.birthday = $(".birthday").val()
+      clock.calculateExpectancy()
+      clock.saveConfig()
     @setTime('all')
     window.setInterval (=>
       @setTime("all")
@@ -149,7 +149,7 @@ class Clock
     return false if not @config.changecolors
     clock.config.hue += .01
     clock.setRadii()
-    clock.config.hue = 0  if clock.config.hue == 359
+    clock.config.hue = 0  if clock.config.hue >= 359.99
 
   rotateClock: (context="all") ->
     if not @config.rotate
