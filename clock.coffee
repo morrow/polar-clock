@@ -1,39 +1,36 @@
-clock = 
+class Clock
 
-  config:
-    age:              25
-    gender:           "male"
-    bmi:              25
-    expectancy:       75
-    hue:              195
-    lightlabels:      true
-    smoker:           false
-    reverse:          false
-    rotate:           false
-    rotate_context:   "minute"
-    show_labels:      true
-    show_percentage:  false
-    show_grid:        true
-    line_width:       50
-
-  # available contexts: second minute hour day week month year decade life century millenium earth
-  contexts: ["minute", "hour", "day", "week", "month", "year", "life"]
-  
-  radii: []
-  
-  styles: {}
-
-  initialize:->
+  constructor:->
+    # configuration
+    @config =
+      age:              25
+      gender:           "male"
+      bmi:              25
+      expectancy:       75
+      hue:              195
+      checkcolors:      false
+      lightlabels:      true
+      smoker:           false
+      reverse:          false
+      rotate:           false
+      rotate_context:   "minute"
+      show_labels:      true
+      show_percentage:  false
+      show_grid:        true
+      line_width:       50
+    @contexts = ["minute", "hour", "day", "week", "month", "year", "life"] # available contexts: second minute hour day week month year decade life century millenium earth
+    @radii = []
+    @styles = {}
     @canvas = $("#clock")[0]
     @ctx = @canvas.getContext("2d")
-    $("#options-toggle").live "click", (e)->
-      $("#options").toggle()
-    $("body").live "click", (e)->
-      if e.target.nodeName.toLowerCase().match /canvas|button/
-        $("#options").hide()
+    window.clock = @
+  
+  initialize:->
     @loadConfig()
     @setRadii()
     @calculateExpectancy()
+    $("#options-toggle").live "click", (e)-> $("#options").toggle()
+    $("body").live "click", (e)-> $("#options").hide() if e.target.nodeName.toLowerCase().match /canvas|button/
     $("#clock-options").delegate "input, select", "change click keyup blur", ->
       if $(this).attr("type") is "range"
         clock.config[$(this)[0].className] = Math.max(Math.min($(this).val(), $(this).attr("max")), $(this).attr("min"))
@@ -43,67 +40,67 @@ clock =
         clock.config[$(this)[0].className] = $(this).val()
       clock.setRadii()
       clock.saveConfig()
-    $("#personal-options").delegate "input, select", "change click keyup blur", ->
+    $("#personal-options").delegate "input, select", "change click keyup blur", =>
       value = $(this).val().toLowerCase()
       if $(this)[0].className.match /gender|bmi|age/
-        clock.config[$(this)[0].className] = value
+        @config[$(this)[0].className] = value
       else if $(this)[0].className.match /smoker/
-        clock.config["smoker"] = !!$(this).attr("checked")
+        @config["smoker"] = !!$(this).attr("checked")
       else if $(this)[0].className.match /birthday/
         if $(".birthday").val()
-          clock.config.birthday = $(".birthday").val()
-      clock.calculateExpectancy()
-      clock.saveConfig()
-    window.setInterval('clock.setTime("all")', 1000)
-    window.setInterval('clock.setTime("minute")', 50)
+          @config.birthday = $(".birthday").val()
+      @calculateExpectancy()
+      @saveConfig()
+    @setTime('all')
+    window.setInterval (=>
+      @setTime("all")
+      @changeColors()
+    ), 1000
+    window.setInterval (=>
+      @setTime("minute")
+    ), 20
 
-  calculateExpectancy:->
-    # http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2662372/?tool=pmcentrez
+  calculateExpectancy: ->
+    # http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2662372
     if $(".birthday").val()
       current = new Date()
-      birthday = new Date(clock.config.birthday)
-      clock.config.age = (current.getTime() - birthday.getTime()) / 86400000 / 365
-    age = clock.config.age
-    bmi = clock.config.bmi
-    gender = clock.config.gender
-    smoker = clock.config.smoker
-    expectancy = {"male":75,"female":80}[gender]
-    if bmi <= 20
-      expectancy -= 3
-    if bmi > 25
-      expectancy -= Math.min(bmi - 25, (bmi-25)/2)
-    if smoker
-      expectancy -= 10
-    $(".expectancy.output").text(clock.config.expectancy = parseInt(expectancy))
-    $(".age.output").text(parseInt(clock.config.age * 100)/100)
+      birthday = new Date(@config.birthday)
+      @config.age = (current.getTime() - birthday.getTime()) / 86400000 / 365
+    bmi = @config.bmi
+    expectancy = {"male":75,"female":80}[@config.gender]
+    expectancy -= Math.max(20-bmi, (20-bmi)/2) if bmi <= 20
+    expectancy -= Math.min(bmi - 25, (bmi-25)/2) if bmi > 25
+    expectancy -= 10 if @config.smoker
+    $(".expectancy.output").text(@config.expectancy = parseInt(expectancy))
+    $(".age.output").text(parseInt(@config.age * 100)/100)
 
-  loadConfig:->
+  loadConfig: ->
     try
       config = JSON.parse window.localStorage["config"] if window.localStorage["config"] 
     catch error
       config = false
     if typeof config is "object"
-      clock.config = config 
+      @config = config 
       $("#options").hide()
-    for item of clock.config
+    for item of @config
       if $(".#{item}").length
         if $(".#{item}").attr("type") is "checkbox"
-          $(".#{item}")[0].checked = !!clock.config[item]
+          $(".#{item}")[0].checked = !!@config[item]
         else
-          $(".#{item}").val(clock.config[item])
+          $(".#{item}").val(@config[item])
 
-  saveConfig:->
-    window.localStorage["config"] = JSON.stringify clock.config
+  saveConfig: ->
+    window.localStorage["config"] = JSON.stringify @config
     
-  setRadii:->
+  setRadii: ->
     for item in @contexts
-      if clock.config["reverse"] is true
-        clock.radii[item] = (@config.line_width * _i) + (@config.line_width)
+      if @config["reverse"] is true
+        @radii[item] = (@config.line_width * _i) + (@config.line_width)
       else
-        clock.radii[item] = _len * @config.line_width - @config.line_width * _i
-      @styles[item] = "hsl(#{clock.config.hue}, 100%, #{60 - (_i/(_len*2))*100}%)"
+        @radii[item] = _len * @config.line_width - @config.line_width * _i
+      @styles[item] = "hsl(#{@config.hue}, 100%, #{60 - (_i/(_len*2))*100}%)"
         
-  draw:(end, type)->
+  draw: (end, type) ->
     radius = @radii[type]
     @ctx.beginPath()
     @ctx.lineWidth = @config.line_width + 2
@@ -117,13 +114,12 @@ clock =
     @ctx.stroke()
     @ctx.closePath()
 
-
-  drawText:(context="all")->
+  drawText: (context="all") ->
     @ctx.font = "bold 13px arial"
     offset = 5
     for item of @radii
       percent = parseInt((@styles[item].split(' ')[@styles[item].split(' ').length-1]).split(')')[0])
-      if clock.config.lightlabels
+      if @config.lightlabels
         @ctx.fillStyle = "white"
       else
         @ctx.fillStyle = "black"
@@ -133,8 +129,8 @@ clock =
       text += "#{parseInt(clock[item]/60*100)}%" if @config.show_percentage
       @ctx.fillText(text, @canvas.width/2+offset, @canvas.height/2-@radii[item]+offset) if text
 
-
-  drawGrid:->
+  drawGrid: ->
+    return false if not @config.show_grid
     @ctx.beginPath()
     @ctx.lineWidth = 1
     @ctx.strokeStyle = "rgba(0,0,0,.5)"
@@ -149,20 +145,27 @@ clock =
     @ctx.stroke()
     @ctx.closePath()
 
-  rotateClock:(context="all")->
-    if not @config.rotate
-      $("body").removeClass "rotating"
-      $("#clock").css
-        "-webkit-transform":"rotate(0deg)"
-        "-moz-transform":"rotate(0deg)"
-      return false
-    rotate = -(clock[@config.rotate_context]*6)
-    $("body").addClass "rotating"
-    $("#clock").css
-      "-webkit-transform":"rotate(#{rotate}deg)"
-      "-moz-transform":"rotate(#{rotate}deg)"
+  changeColors: ->
+    return false if not @config.changecolors
+    clock.config.hue += .01
+    clock.setRadii()
+    clock.config.hue = 0  if clock.config.hue == 359
 
-  drawClock:(context="all")-> 
+  rotateClock: (context="all") ->
+    if not @config.rotate
+      if $("body")[0].className.match /rotating/
+        $("body").removeClass "rotating"
+        $("#clock").css
+          "-webkit-transform":"rotate(0deg)"
+          "-moz-transform":"rotate(0deg)"
+    else
+      rotate = -(clock[@config.rotate_context]*6)
+      $("body").addClass "rotating"
+      $("#clock").css
+        "-webkit-transform":"rotate(#{rotate}deg)"
+        "-moz-transform":"rotate(#{rotate}deg)"
+
+  drawClock: (context="all") -> 
     @ctx.fillStyle = "black"
     @ctx.fillRect(0, 0, @canvas.width, @canvas.height)
     for item in @contexts
@@ -173,7 +176,7 @@ clock =
     @drawText(context)
     @rotateClock(context)
 
-  setTime:(context="all")->
+  setTime: (context="all") ->
     d = (new Date())
     d2 = new Date(d.getFullYear(), 0, 1)
     if context is "second" or "all"
@@ -193,7 +196,7 @@ clock =
     if context is "decade" or "all"
       @decade = (d.getYear() % 10  + ((Math.ceil((d - d2) / 86400000)) / 365) + @hour / 60 / 365) / 10  * 60
     if context is "life" or "all"
-      @life = ((clock.config.age*365*24 + (Math.ceil((d - d2) / 86400000)) + @hour / 60)  / (clock.config.expectancy*365*24)) * 60
+      @life = ((@config.age*365*24 + (Math.ceil((d - d2) / 86400000)) + @hour / 60)  / (@config.expectancy*365*24)) * 60
       $(".age").val(@config.age=1) if @life == 60
     if context is "century" or "all"
       @century = (((new Date()).getFullYear() % 100) / 100) * 60

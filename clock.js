@@ -1,27 +1,35 @@
-var clock;
-clock = {
-  config: {
-    age: 25,
-    gender: "male",
-    bmi: 25,
-    expectancy: 75,
-    hue: 195,
-    lightlabels: true,
-    smoker: false,
-    reverse: false,
-    rotate: false,
-    rotate_context: "minute",
-    show_labels: true,
-    show_percentage: false,
-    show_grid: true,
-    line_width: 50
-  },
-  contexts: ["minute", "hour", "day", "week", "month", "year", "life"],
-  radii: [],
-  styles: {},
-  initialize: function() {
+var Clock;
+var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+Clock = (function() {
+  function Clock() {
+    this.config = {
+      age: 25,
+      gender: "male",
+      bmi: 25,
+      expectancy: 75,
+      hue: 195,
+      checkcolors: false,
+      lightlabels: true,
+      smoker: false,
+      reverse: false,
+      rotate: false,
+      rotate_context: "minute",
+      show_labels: true,
+      show_percentage: false,
+      show_grid: true,
+      line_width: 50
+    };
+    this.contexts = ["minute", "hour", "day", "week", "month", "year", "life"];
+    this.radii = [];
+    this.styles = {};
     this.canvas = $("#clock")[0];
     this.ctx = this.canvas.getContext("2d");
+    window.clock = this;
+  }
+  Clock.prototype.initialize = function() {
+    this.loadConfig();
+    this.setRadii();
+    this.calculateExpectancy();
     $("#options-toggle").live("click", function(e) {
       return $("#options").toggle();
     });
@@ -30,9 +38,6 @@ clock = {
         return $("#options").hide();
       }
     });
-    this.loadConfig();
-    this.setRadii();
-    this.calculateExpectancy();
     $("#clock-options").delegate("input, select", "change click keyup blur", function() {
       if ($(this).attr("type") === "range") {
         clock.config[$(this)[0].className] = Math.max(Math.min($(this).val(), $(this).attr("max")), $(this).attr("min"));
@@ -44,52 +49,55 @@ clock = {
       clock.setRadii();
       return clock.saveConfig();
     });
-    $("#personal-options").delegate("input, select", "change click keyup blur", function() {
+    $("#personal-options").delegate("input, select", "change click keyup blur", __bind(function() {
       var value;
       value = $(this).val().toLowerCase();
       if ($(this)[0].className.match(/gender|bmi|age/)) {
-        clock.config[$(this)[0].className] = value;
+        this.config[$(this)[0].className] = value;
       } else if ($(this)[0].className.match(/smoker/)) {
-        clock.config["smoker"] = !!$(this).attr("checked");
+        this.config["smoker"] = !!$(this).attr("checked");
       } else if ($(this)[0].className.match(/birthday/)) {
         if ($(".birthday").val()) {
-          clock.config.birthday = $(".birthday").val();
+          this.config.birthday = $(".birthday").val();
         }
       }
-      clock.calculateExpectancy();
-      return clock.saveConfig();
-    });
-    window.setInterval('clock.setTime("all")', 1000);
-    return window.setInterval('clock.setTime("minute")', 50);
-  },
-  calculateExpectancy: function() {
-    var age, birthday, bmi, current, expectancy, gender, smoker;
+      this.calculateExpectancy();
+      return this.saveConfig();
+    }, this));
+    this.setTime('all');
+    window.setInterval((__bind(function() {
+      this.setTime("all");
+      return this.changeColors();
+    }, this)), 1000);
+    return window.setInterval((__bind(function() {
+      return this.setTime("minute");
+    }, this)), 20);
+  };
+  Clock.prototype.calculateExpectancy = function() {
+    var birthday, bmi, current, expectancy;
     if ($(".birthday").val()) {
       current = new Date();
-      birthday = new Date(clock.config.birthday);
-      clock.config.age = (current.getTime() - birthday.getTime()) / 86400000 / 365;
+      birthday = new Date(this.config.birthday);
+      this.config.age = (current.getTime() - birthday.getTime()) / 86400000 / 365;
     }
-    age = clock.config.age;
-    bmi = clock.config.bmi;
-    gender = clock.config.gender;
-    smoker = clock.config.smoker;
+    bmi = this.config.bmi;
     expectancy = {
       "male": 75,
       "female": 80
-    }[gender];
+    }[this.config.gender];
     if (bmi <= 20) {
-      expectancy -= 3;
+      expectancy -= Math.max(20 - bmi, (20 - bmi) / 2);
     }
     if (bmi > 25) {
       expectancy -= Math.min(bmi - 25, (bmi - 25) / 2);
     }
-    if (smoker) {
+    if (this.config.smoker) {
       expectancy -= 10;
     }
-    $(".expectancy.output").text(clock.config.expectancy = parseInt(expectancy));
-    return $(".age.output").text(parseInt(clock.config.age * 100) / 100);
-  },
-  loadConfig: function() {
+    $(".expectancy.output").text(this.config.expectancy = parseInt(expectancy));
+    return $(".age.output").text(parseInt(this.config.age * 100) / 100);
+  };
+  Clock.prototype.loadConfig = function() {
     var config, item, _results;
     try {
       if (window.localStorage["config"]) {
@@ -99,34 +107,34 @@ clock = {
       config = false;
     }
     if (typeof config === "object") {
-      clock.config = config;
+      this.config = config;
       $("#options").hide();
     }
     _results = [];
-    for (item in clock.config) {
-      _results.push($("." + item).length ? $("." + item).attr("type") === "checkbox" ? $("." + item)[0].checked = !!clock.config[item] : $("." + item).val(clock.config[item]) : void 0);
+    for (item in this.config) {
+      _results.push($("." + item).length ? $("." + item).attr("type") === "checkbox" ? $("." + item)[0].checked = !!this.config[item] : $("." + item).val(this.config[item]) : void 0);
     }
     return _results;
-  },
-  saveConfig: function() {
-    return window.localStorage["config"] = JSON.stringify(clock.config);
-  },
-  setRadii: function() {
+  };
+  Clock.prototype.saveConfig = function() {
+    return window.localStorage["config"] = JSON.stringify(this.config);
+  };
+  Clock.prototype.setRadii = function() {
     var item, _i, _len, _ref, _results;
     _ref = this.contexts;
     _results = [];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       item = _ref[_i];
-      if (clock.config["reverse"] === true) {
-        clock.radii[item] = (this.config.line_width * _i) + this.config.line_width;
+      if (this.config["reverse"] === true) {
+        this.radii[item] = (this.config.line_width * _i) + this.config.line_width;
       } else {
-        clock.radii[item] = _len * this.config.line_width - this.config.line_width * _i;
+        this.radii[item] = _len * this.config.line_width - this.config.line_width * _i;
       }
-      _results.push(this.styles[item] = "hsl(" + clock.config.hue + ", 100%, " + (60 - (_i / (_len * 2)) * 100) + "%)");
+      _results.push(this.styles[item] = "hsl(" + this.config.hue + ", 100%, " + (60 - (_i / (_len * 2)) * 100) + "%)");
     }
     return _results;
-  },
-  draw: function(end, type) {
+  };
+  Clock.prototype.draw = function(end, type) {
     var radius, start;
     radius = this.radii[type];
     this.ctx.beginPath();
@@ -142,8 +150,8 @@ clock = {
     this.ctx.arc(this.canvas.width / 2, this.canvas.height / 2, radius, end, start, true);
     this.ctx.stroke();
     return this.ctx.closePath();
-  },
-  drawText: function(context) {
+  };
+  Clock.prototype.drawText = function(context) {
     var item, offset, percent, text, _results;
     if (context == null) {
       context = "all";
@@ -153,7 +161,7 @@ clock = {
     _results = [];
     for (item in this.radii) {
       percent = parseInt((this.styles[item].split(' ')[this.styles[item].split(' ').length - 1]).split(')')[0]);
-      if (clock.config.lightlabels) {
+      if (this.config.lightlabels) {
         this.ctx.fillStyle = "white";
       } else {
         this.ctx.fillStyle = "black";
@@ -171,8 +179,11 @@ clock = {
       _results.push(text ? this.ctx.fillText(text, this.canvas.width / 2 + offset, this.canvas.height / 2 - this.radii[item] + offset) : void 0);
     }
     return _results;
-  },
-  drawGrid: function() {
+  };
+  Clock.prototype.drawGrid = function() {
+    if (!this.config.show_grid) {
+      return false;
+    }
     this.ctx.beginPath();
     this.ctx.lineWidth = 1;
     this.ctx.strokeStyle = "rgba(0,0,0,.5)";
@@ -187,28 +198,40 @@ clock = {
     }
     this.ctx.stroke();
     return this.ctx.closePath();
-  },
-  rotateClock: function(context) {
+  };
+  Clock.prototype.changeColors = function() {
+    if (!this.config.changecolors) {
+      return false;
+    }
+    clock.config.hue += .01;
+    clock.setRadii();
+    if (clock.config.hue === 359) {
+      return clock.config.hue = 0;
+    }
+  };
+  Clock.prototype.rotateClock = function(context) {
     var rotate;
     if (context == null) {
       context = "all";
     }
     if (!this.config.rotate) {
-      $("body").removeClass("rotating");
-      $("#clock").css({
-        "-webkit-transform": "rotate(0deg)",
-        "-moz-transform": "rotate(0deg)"
+      if ($("body")[0].className.match(/rotating/)) {
+        $("body").removeClass("rotating");
+        return $("#clock").css({
+          "-webkit-transform": "rotate(0deg)",
+          "-moz-transform": "rotate(0deg)"
+        });
+      }
+    } else {
+      rotate = -(clock[this.config.rotate_context] * 6);
+      $("body").addClass("rotating");
+      return $("#clock").css({
+        "-webkit-transform": "rotate(" + rotate + "deg)",
+        "-moz-transform": "rotate(" + rotate + "deg)"
       });
-      return false;
     }
-    rotate = -(clock[this.config.rotate_context] * 6);
-    $("body").addClass("rotating");
-    return $("#clock").css({
-      "-webkit-transform": "rotate(" + rotate + "deg)",
-      "-moz-transform": "rotate(" + rotate + "deg)"
-    });
-  },
-  drawClock: function(context) {
+  };
+  Clock.prototype.drawClock = function(context) {
     var item, _i, _len, _ref;
     if (context == null) {
       context = "all";
@@ -228,8 +251,8 @@ clock = {
     this.drawGrid(context);
     this.drawText(context);
     return this.rotateClock(context);
-  },
-  setTime: function(context) {
+  };
+  Clock.prototype.setTime = function(context) {
     var d, d2;
     if (context == null) {
       context = "all";
@@ -261,7 +284,7 @@ clock = {
       this.decade = (d.getYear() % 10 + ((Math.ceil((d - d2) / 86400000)) / 365) + this.hour / 60 / 365) / 10 * 60;
     }
     if (context === "life" || "all") {
-      this.life = ((clock.config.age * 365 * 24 + (Math.ceil((d - d2) / 86400000)) + this.hour / 60) / (clock.config.expectancy * 365 * 24)) * 60;
+      this.life = ((this.config.age * 365 * 24 + (Math.ceil((d - d2) / 86400000)) + this.hour / 60) / (this.config.expectancy * 365 * 24)) * 60;
       if (this.life === 60) {
         $(".age").val(this.config.age = 1);
       }
@@ -276,5 +299,6 @@ clock = {
       this.earth = ((4570000000 + (new Date()).getTime() / 30000000000) / 10000000000) * 60;
     }
     return this.drawClock(context);
-  }
-};
+  };
+  return Clock;
+})();

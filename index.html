@@ -36,6 +36,8 @@
         </select>
         <label> Clock color:</label>
         <input class="hue" type="range"  min="0" max="360" step="1" value="195"/>
+        <label> Change colors: </label>
+        <input class="changecolors" type="checkbox" />
         <label> Light text: </label>
         <input class="lightlabels" type="checkbox" />
       </div>
@@ -62,6 +64,6 @@
       </div>
       <button id="okay">okay</button>
     </div>
-    <script type="text/javascript">$(document).ready(function(){clock.initialize()});</script>
+    <script type="text/javascript">$(document).ready(function(){new Clock().initialize()});</script>
   </body>
 </html>
