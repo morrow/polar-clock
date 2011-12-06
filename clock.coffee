@@ -130,9 +130,8 @@ class Clock
       @ctx.fillText(text, @canvas.width/2+offset, @canvas.height/2-@radii[item]+offset) if text
 
   drawGrid: ->
-    return false if not @config.show_grid
     @ctx.beginPath()
-    @ctx.lineWidth = 1
+    @ctx.lineWidth = 2
     @ctx.strokeStyle = "rgba(0,0,0,.5)"
     if @config.show_grid
       @ctx.moveTo(@canvas.width/2, 0)
