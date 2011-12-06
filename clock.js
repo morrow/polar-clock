@@ -181,11 +181,8 @@ Clock = (function() {
     return _results;
   };
   Clock.prototype.drawGrid = function() {
-    if (!this.config.show_grid) {
-      return false;
-    }
     this.ctx.beginPath();
-    this.ctx.lineWidth = 1;
+    this.ctx.lineWidth = 2;
     this.ctx.strokeStyle = "rgba(0,0,0,.5)";
     if (this.config.show_grid) {
       this.ctx.moveTo(this.canvas.width / 2, 0);
