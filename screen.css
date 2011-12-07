@@ -61,7 +61,7 @@ button {
   text-align:left;
 }
 
-#options #okay {
+#options #okay, #options #reset {
   float:right;
   position:relative;
   top:-15px;
@@ -113,4 +113,8 @@ input[type=number], input.birthday {
 }
 input.birthday {
   width:100px;
+}
+
+#reset {
+  color:red;
 }

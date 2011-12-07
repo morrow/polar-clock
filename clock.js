@@ -4,7 +4,7 @@ Clock = (function() {
   function Clock() {
     this.config = {
       age: 25,
-      gender: "male",
+      gender: 'male',
       bmi: 25,
       expectancy: 75,
       hue: 195,
@@ -13,7 +13,7 @@ Clock = (function() {
       smoker: false,
       reverse: false,
       rotate: false,
-      rotate_context: "minute",
+      rotate_context: 'minute',
       show_labels: true,
       show_percentage: false,
       show_grid: false,
@@ -23,43 +23,46 @@ Clock = (function() {
     this.contexts = ['minute', 'hour', 'day', 'week', 'month', 'year', 'life'];
     this.radii = [];
     this.styles = {};
-    this.canvas = $("#clock")[0];
-    this.ctx = this.canvas.getContext("2d");
+    this.canvas = $('#clock')[0];
+    this.ctx = this.canvas.getContext('2d');
     window.clock = this;
   }
   Clock.prototype.initialize = function() {
     this.loadConfig();
     this.setRadii();
     this.calculateExpectancy();
-    $("#options-toggle").live("click", function(e) {
-      return $("#options").toggle();
+    $('#options-toggle').live('click', function(e) {
+      return $('#options').toggle();
     });
-    $("body").live("click", function(e) {
-      if (e.target.nodeName.toLowerCase().match(/canvas|button/)) {
-        return $("#options").hide();
+    $('body').live('click', function(e) {
+      if (e.target.id === 'reset') {
+        delete window.localStorage['config'];
+        return window.location.href = window.location.href;
+      } else if (e.target.nodeName.toLowerCase().match(/canvas|button/)) {
+        return $('#options').hide();
       }
     });
-    $("#clock-options").delegate("input, select", "change click keyup blur", function() {
-      if ($(this).attr("type") === "range") {
-        clock.config[$(this)[0].className] = Math.max(Math.min($(this).val(), $(this).attr("max")), $(this).attr("min"));
-      } else if ($(this).attr("type") === "checkbox") {
-        clock.config[$(this)[0].className] = $(this).attr("checked") === "checked";
-      } else if ($(this)[0].nodeName.toLowerCase() === "select") {
+    $('#clock-options').delegate('input, select', 'change click keyup blur', function() {
+      if ($(this).attr('type') === 'range') {
+        clock.config[$(this)[0].className] = Math.max(Math.min($(this).val(), $(this).attr('max')), $(this).attr('min'));
+      } else if ($(this).attr('type') === 'checkbox') {
+        clock.config[$(this)[0].className] = $(this).attr('checked') === 'checked';
+      } else if ($(this)[0].nodeName.toLowerCase() === 'select') {
         clock.config[$(this)[0].className] = $(this).val();
       }
       clock.setRadii();
       return clock.saveConfig();
     });
-    $("#personal-options").delegate("input, select", "change click keyup blur", function() {
+    $('#personal-options').delegate('input, select', 'change click keyup blur', function() {
       var value;
       value = $(this).val().toLowerCase();
       if ($(this)[0].className.match(/gender|bmi|age/)) {
         clock.config[$(this)[0].className] = value;
       } else if ($(this)[0].className.match(/smoker/)) {
-        clock.config["smoker"] = !!$(this).attr("checked");
+        clock.config['smoker'] = !!$(this).attr('checked');
       } else if ($(this)[0].className.match(/birthday/)) {
-        if ($(".birthday").val()) {
-          clock.config.birthday = $(".birthday").val();
+        if ($('.birthday').val()) {
+          clock.config.birthday = $('.birthday').val();
         }
       }
       clock.calculateExpectancy();
@@ -67,24 +70,24 @@ Clock = (function() {
     });
     this.setTime('all');
     window.setInterval((__bind(function() {
-      this.setTime("all");
+      this.setTime('all');
       return this.changeColors();
     }, this)), 1000);
     return window.setInterval((__bind(function() {
-      return this.setTime("minute");
+      return this.setTime('minute');
     }, this)), 20);
   };
   Clock.prototype.calculateExpectancy = function() {
     var birthday, bmi, current, expectancy;
-    if ($(".birthday").val()) {
+    if ($('.birthday').val()) {
       current = new Date();
       birthday = new Date(this.config.birthday);
       this.config.age = (current.getTime() - birthday.getTime()) / 86400000 / 365;
     }
     bmi = this.config.bmi;
     expectancy = {
-      "male": 75,
-      "female": 80
+      'male': 75,
+      'female': 80
     }[this.config.gender];
     if (bmi <= 20) {
       expectancy -= Math.max(20 - bmi, (20 - bmi) / 2);
@@ -95,30 +98,30 @@ Clock = (function() {
     if (this.config.smoker) {
       expectancy -= 10;
     }
-    $(".expectancy.output").text(this.config.expectancy = parseInt(expectancy));
-    return $(".age.output").text(parseInt(this.config.age * 100) / 100);
+    $('.expectancy.output').text(this.config.expectancy = parseInt(expectancy));
+    return $('.age.output').text(parseInt(this.config.age * 100) / 100);
   };
   Clock.prototype.loadConfig = function() {
     var config, item, _results;
     try {
-      if (window.localStorage["config"]) {
-        config = JSON.parse(window.localStorage["config"]);
+      if (window.localStorage['config']) {
+        config = JSON.parse(window.localStorage['config']);
       }
     } catch (error) {
       config = false;
     }
-    if (typeof config === "object") {
+    if (typeof config === 'object') {
       this.config = config;
-      $("#options").hide();
+      $('#options').hide();
     }
     _results = [];
     for (item in this.config) {
-      _results.push($("." + item).length ? $("." + item).attr("type") === "checkbox" ? $("." + item)[0].checked = !!this.config[item] : $("." + item).val(this.config[item]) : void 0);
+      _results.push($("." + item).length ? $("." + item).attr('type') === 'checkbox' ? $("." + item)[0].checked = !!this.config[item] : $("." + item).val(this.config[item]) : void 0);
     }
     return _results;
   };
   Clock.prototype.saveConfig = function() {
-    return window.localStorage["config"] = JSON.stringify(this.config);
+    return window.localStorage['config'] = JSON.stringify(this.config);
   };
   Clock.prototype.setRadii = function() {
     var item, _i, _len, _ref, _results;
@@ -126,7 +129,7 @@ Clock = (function() {
     _results = [];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       item = _ref[_i];
-      if (this.config["reverse"] === true) {
+      if (this.config['reverse'] === true) {
         this.radii[item] = (this.config.line_width * _i) + this.config.line_width;
       } else {
         this.radii[item] = _len * this.config.line_width - this.config.line_width * _i;
@@ -155,24 +158,24 @@ Clock = (function() {
   Clock.prototype.drawText = function(context) {
     var item, offset, percent, text, _results;
     if (context == null) {
-      context = "all";
+      context = 'all';
     }
-    this.ctx.font = "bold 13px arial";
+    this.ctx.font = 'bold 13px arial';
     offset = 5;
     _results = [];
     for (item in this.radii) {
       percent = parseInt((this.styles[item].split(' ')[this.styles[item].split(' ').length - 1]).split(')')[0]);
       if (this.config.lightlabels) {
-        this.ctx.fillStyle = "white";
+        this.ctx.fillStyle = 'white';
       } else {
-        this.ctx.fillStyle = "black";
+        this.ctx.fillStyle = 'black';
       }
-      text = "";
+      text = '';
       if (this.config.show_labels) {
         text = item;
       }
       if (this.config.show_labels && this.config.show_percentage) {
-        text += " - ";
+        text += ' - ';
       }
       if (this.config.show_percentage) {
         text += "" + (parseInt(clock[item] / 60 * 100)) + "%";
@@ -184,7 +187,7 @@ Clock = (function() {
   Clock.prototype.drawGrid = function() {
     this.ctx.beginPath();
     this.ctx.lineWidth = 2;
-    this.ctx.strokeStyle = "rgba(0,0,0,.5)";
+    this.ctx.strokeStyle = 'rgba(0,0,0,.5)';
     if (this.config.show_grid) {
       this.ctx.moveTo(this.canvas.width / 2, 0);
       this.ctx.lineTo(this.canvas.width / 2, this.canvas.height);
@@ -210,36 +213,36 @@ Clock = (function() {
   Clock.prototype.rotateClock = function(context) {
     var rotate;
     if (context == null) {
-      context = "all";
+      context = 'all';
     }
     if (!this.config.rotate) {
-      if ($("body")[0].className.match(/rotating/)) {
-        $("body").removeClass("rotating");
-        return $("#clock").css({
-          "-webkit-transform": "rotate(0deg)",
-          "-moz-transform": "rotate(0deg)"
+      if ($('body')[0].className.match(/rotating/)) {
+        $('body').removeClass('rotating');
+        return $('#clock').css({
+          '-webkit-transform': 'rotate(0deg)',
+          '-moz-transform': 'rotate(0deg)'
         });
       }
     } else {
       rotate = -(clock[this.config.rotate_context] * 6);
-      $("body").addClass("rotating");
-      return $("#clock").css({
-        "-webkit-transform": "rotate(" + rotate + "deg)",
-        "-moz-transform": "rotate(" + rotate + "deg)"
+      $('body').addClass('rotating');
+      return $('#clock').css({
+        '-webkit-transform': 'rotate(#{rotate}deg)',
+        '-moz-transform': 'rotate(#{rotate}deg)'
       });
     }
   };
   Clock.prototype.drawClock = function(context) {
     var item, _i, _len, _ref;
     if (context == null) {
-      context = "all";
+      context = 'all';
     }
-    this.ctx.fillStyle = "black";
+    this.ctx.fillStyle = 'black';
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     _ref = this.contexts;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       item = _ref[_i];
-      if (item === context || "all") {
+      if (item === context || 'all') {
         this.draw(clock[item], item);
       }
     }
@@ -253,47 +256,47 @@ Clock = (function() {
   Clock.prototype.setTime = function(context) {
     var d, d2;
     if (context == null) {
-      context = "all";
+      context = 'all';
     }
     d = new Date();
     d2 = new Date(d.getFullYear(), 0, 1);
-    if (context === "second" || "all") {
+    if (context === 'second' || 'all') {
       this.second = ((new Date()).getMilliseconds() / 1000) * 60;
     }
-    if (context === "minute" || "all") {
+    if (context === 'minute' || 'all') {
       this.minute = d.getSeconds() + (parseInt(d.getTime() / 10) % parseInt(d.getTime() / 1000)) / 100;
     }
-    if (context === "hour" || "all") {
+    if (context === 'hour' || 'all') {
       this.hour = d.getMinutes() + (this.minute / 60);
     }
-    if (context === "day" || "all") {
+    if (context === 'day' || 'all') {
       this.day = (d.getHours() + (this.hour / 60)) / 24 * 60;
     }
-    if (context === "week" || "all") {
+    if (context === 'week' || 'all') {
       this.week = ((d.getDay() - d.getHours() / 24) / 7) * 60;
     }
-    if (context === "month" || "all") {
+    if (context === 'month' || 'all') {
       this.month = (d.getDate() / (32 - new Date(d.getYear(), d.getMonth(), 32).getDate())) * 60 - (1 - this.day / 60);
     }
-    if (context === "year" || "all") {
+    if (context === 'year' || 'all') {
       this.year = (Math.ceil((d - d2) / 86400000) + this.day / 60) / 365 * 60;
     }
-    if (context === "decade" || "all") {
+    if (context === 'decade' || 'all') {
       this.decade = (d.getYear() % 10 + ((Math.ceil((d - d2) / 86400000)) / 365) + this.hour / 60 / 365) / 10 * 60;
     }
-    if (context === "life" || "all") {
+    if (context === 'life' || 'all') {
       this.life = ((this.config.age * 365 * 24 + (Math.ceil((d - d2) / 86400000)) + this.hour / 60) / (this.config.expectancy * 365 * 24)) * 60;
       if (this.life === 60) {
-        $(".age").val(this.config.age = 1);
+        $('.age').val(this.config.age = 1);
       }
     }
-    if (context === "century" || "all") {
+    if (context === 'century' || 'all') {
       this.century = (((new Date()).getFullYear() % 100) / 100) * 60;
     }
-    if (context === "millenium" || "all") {
+    if (context === 'millenium' || 'all') {
       this.millenium = (((new Date()).getFullYear() % 1000) / 1000) * 60;
     }
-    if (context === "earth" || "all") {
+    if (context === 'earth' || 'all') {
       this.earth = ((4570000000 + (new Date()).getTime() / 30000000000) / 10000000000) * 60;
     }
     return this.drawClock(context);
