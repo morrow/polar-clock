@@ -16,9 +16,10 @@ class Clock
       rotate_context:   "minute"
       show_labels:      true
       show_percentage:  false
-      show_grid:        true
+      show_grid:        false
       line_width:       50
-    @contexts = ["minute", "hour", "day", "week", "month", "year", "life"] # available contexts: second minute hour day week month year decade life century millenium earth
+    @available_contexts: ['second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'decade', 'life', 'century', 'millenium', 'earth']
+    @contexts = ['minute', 'hour', 'day', 'week', 'month', 'year', 'life'] 
     @radii = []
     @styles = {}
     @canvas = $("#clock")[0]
