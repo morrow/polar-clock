@@ -19,9 +19,7 @@ Clock = (function() {
       show_grid: false,
       line_width: 50
     };
-    ({
-      this.available_contexts: ['second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'decade', 'life', 'century', 'millenium', 'earth']
-    });
+    this.available_contexts = ['second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'decade', 'life', 'century', 'millenium', 'earth'];
     this.contexts = ['minute', 'hour', 'day', 'week', 'month', 'year', 'life'];
     this.radii = [];
     this.styles = {};

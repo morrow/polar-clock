@@ -18,7 +18,7 @@ class Clock
       show_percentage:  false
       show_grid:        false
       line_width:       50
-    @available_contexts: ['second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'decade', 'life', 'century', 'millenium', 'earth']
+    @available_contexts =  ['second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'decade', 'life', 'century', 'millenium', 'earth']
     @contexts = ['minute', 'hour', 'day', 'week', 'month', 'year', 'life'] 
     @radii = []
     @styles = {}
