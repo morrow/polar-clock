@@ -27,6 +27,9 @@ class Clock
     window.clock = @
   
   initialize:->
+    if not @translated
+      @ctx.translate(0.5, 0.5) 
+      @translated = true
     @loadConfig()
     @setRadii()
     @calculateExpectancy()

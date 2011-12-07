@@ -28,6 +28,10 @@ Clock = (function() {
     window.clock = this;
   }
   Clock.prototype.initialize = function() {
+    if (!this.translated) {
+      this.ctx.translate(0.5, 0.5);
+      this.translated = true;
+    }
     this.loadConfig();
     this.setRadii();
     this.calculateExpectancy();
