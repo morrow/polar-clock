@@ -33,8 +33,9 @@ class Clock
     $('#options-toggle').live 'click', (e)-> $('#options').toggle()
     $('body').live 'click', (e)->
       if e.target.id is 'reset'
-        delete window.localStorage['config']
-        window.location.href = window.location.href
+        if confirm "Delete saved configuration data for this clock?"
+          delete window.localStorage['config']
+          window.location.href = window.location.href
       else if e.target.nodeName.toLowerCase().match /canvas|button/
         $('#options').hide() 
     $('#clock-options').delegate 'input, select', 'change click keyup blur', ->
@@ -164,7 +165,7 @@ class Clock
           '-webkit-transform':'rotate(0deg)'
           '-moz-transform':'rotate(0deg)'
     else
-      rotate = -(clock[@config.rotate_context]*6)
+      rotate = -parseInt(clock[@config.rotate_context]*6*1000)/1000
       $('body').addClass 'rotating'
       $('#clock').css
         '-webkit-transform':"rotate(#{rotate}deg)"

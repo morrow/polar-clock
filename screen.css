@@ -67,6 +67,11 @@ button {
   top:-15px;
 }
 
+#options #reset {
+  color:red;
+  right:7px;
+}
+
 #options-toggle {
   color:#aaa;
   position:absolute;
@@ -113,8 +118,4 @@ input[type=number], input.birthday {
 }
 input.birthday {
   width:100px;
-}
-
-#reset {
-  color:red;
 }

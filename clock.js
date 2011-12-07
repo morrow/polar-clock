@@ -36,8 +36,10 @@ Clock = (function() {
     });
     $('body').live('click', function(e) {
       if (e.target.id === 'reset') {
-        delete window.localStorage['config'];
-        return window.location.href = window.location.href;
+        if (confirm("Delete saved configuration data for this clock?")) {
+          delete window.localStorage['config'];
+          return window.location.href = window.location.href;
+        }
       } else if (e.target.nodeName.toLowerCase().match(/canvas|button/)) {
         return $('#options').hide();
       }
@@ -224,7 +226,7 @@ Clock = (function() {
         });
       }
     } else {
-      rotate = -(clock[this.config.rotate_context] * 6);
+      rotate = -parseInt(clock[this.config.rotate_context] * 6 * 1000) / 1000;
       $('body').addClass('rotating');
       return $('#clock').css({
         '-webkit-transform': "rotate(" + rotate + "deg)",
