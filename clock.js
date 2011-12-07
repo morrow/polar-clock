@@ -227,8 +227,8 @@ Clock = (function() {
       rotate = -(clock[this.config.rotate_context] * 6);
       $('body').addClass('rotating');
       return $('#clock').css({
-        '-webkit-transform': 'rotate(#{rotate}deg)',
-        '-moz-transform': 'rotate(#{rotate}deg)'
+        '-webkit-transform': "rotate(" + rotate + "deg)",
+        '-moz-transform': "rotate(" + rotate + "deg)"
       });
     }
   };

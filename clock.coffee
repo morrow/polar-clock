@@ -167,8 +167,8 @@ class Clock
       rotate = -(clock[@config.rotate_context]*6)
       $('body').addClass 'rotating'
       $('#clock').css
-        '-webkit-transform':'rotate(#{rotate}deg)'
-        '-moz-transform':'rotate(#{rotate}deg)'
+        '-webkit-transform':"rotate(#{rotate}deg)"
+        '-moz-transform':"rotate(#{rotate}deg)"
 
   drawClock: (context='all') -> 
     @ctx.fillStyle = 'black'
