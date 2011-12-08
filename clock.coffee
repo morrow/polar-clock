@@ -80,48 +80,64 @@ class Clock
       clock.saveConfig()
     # handle personal options input
     $('#personal-options').delegate 'input, select', 'change click keyup blur', ->
-      
+      # gender, bmi, birthday  
       if $(@)[0].className.match /gender|bmi|age|birthday/
+        # set config to lowercase value
         clock.config[$(@)[0].className] = $(@).val().toLowerCase()
+      # checkbox attributes
       else if $(@)[0].className.match /smoker/
         clock.config['smoker'] = !!$(@).attr('checked')
-      else if $(@)[0].className.match /birthday/
-        if $('.birthday').val()
-          clock.config.birthday = $('.birthday').val()
+      # calculate expectancy
       clock.calculateExpectancy()
+      # save configuration
       clock.saveConfig()
-    @setTime('all')
+    # when window is resized, adjust margins to vertically center canvas
     window.onresize = =>
-      @canvas.style.marginTop = parseInt(Math.max(((window.outerHeight-clock.canvas.height)/3)-20, 0)) + "px"
+      # initial margin is difference between window height and canvas height / 4
+      margin = (window.outerHeight-clock.canvas.height)/4
+      # format margin, set minimum to zero 
+      margin = parseInt(Math.max(margin, 0)) + "px"
+      # set margin
+      @canvas.style.marginTop = margin
+    # vertically center canvas
     window.onresize()
-    window.setInterval (=>
-      @setTime('all')
-      @changeColors()
-    ), 1000
-    window.setInterval (=>
-      @setTime('minute')
-    ), 20
+    # start clock
+    @setTime('all')
+    # start ticking, update all contexts, colors every second
+    window.setInterval ( => @setTime('all') ), 1000
+    # start ticking, update minute context 50 times a second
+    window.setInterval ( => @setTime('minute') ), 20
 
   calculateExpectancy: ->
-    # http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2662372
-    if $('.birthday').val()
+    # source: http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2662372
+    if $('.birthday').val() != @config.birthday
+      # get current date
       current = new Date()
+      # get birth date
       birthday = new Date(@config.birthday)
+      # calculate age from current and birth dates
       @config.age = (current.getTime() - birthday.getTime()) / 86400000 / 365
-    bmi = @config.bmi
+    # initial life expetectancy
     expectancy = {'male':75,'female':80}[@config.gender]
-    expectancy -= Math.max(20-bmi, (20-bmi)/2) if bmi <= 20
-    expectancy -= Math.min(bmi - 25, (bmi-25)/2) if bmi > 25
+    # if bmi is below healthy range, subtract relative amount from expectancy
+    expectancy -= Math.max( 20 - @config.bmi, (20 - @config.bmi) / 2) if @config.bmi <= 20
+    # if bmi is above healthy range, subtract relative amount from expectancy
+    expectancy -= Math.min(@config.bmi - 25, (@config.bmi - 25) / 2) if @config.bmi > 25
+    # subtract 10 if smoker
     expectancy -= 10 if @config.smoker
+    # set output for life expectancy
     $('.expectancy.output').text(@config.expectancy = parseInt(expectancy))
+    # set output for age
     $('.age.output').text(parseInt(@config.age * 100)/100)
 
   loadConfig: ->
+    # load json configuration from localstorage
     try
       config = JSON.parse window.localStorage['config'] if window.localStorage['config'] 
     catch error
       config = false
-    if typeof config is 'object'
+    # 
+    if config instanceof Object
       @config = config 
       $('#options').hide()
     for item of @config
@@ -157,19 +173,23 @@ class Clock
     @ctx.closePath()
 
   drawText: (context='all') ->
-    @ctx.font = 'bold 13px arial'
-    offset = 5
+    font_size = 15
+    @ctx.font = "bold #{font_size-2}px arial"
     for item of @radii
       percent = parseInt((@styles[item].split(' ')[@styles[item].split(' ').length-1]).split(')')[0])
       if @config.lightlabels
         @ctx.fillStyle = 'white'
       else
         @ctx.fillStyle = 'black'
-      text = ''
-      text = item if @config.show_labels
-      text += ' - ' if @config.show_labels and @config.show_percentage
-      text += "#{parseInt(clock[item]/60*100)}%" if @config.show_percentage
-      @ctx.fillText(text, @canvas.width/2+offset, @canvas.height/2-@radii[item]+offset) if text
+      text = []
+      text.push "#{parseInt(clock[item]/60*100)}%" if @config.show_percentage
+      text.push item if @config.show_labels
+      x_offset = (5 / text.length)
+      y_offset = font_size
+      for line in text
+        y = (@canvas.height/2-@radii[item] + y_offset/(3-text.length)) - ((_i) * font_size)
+        x = @canvas.width/2 + x_offset
+        @ctx.fillText(line, x, y)
 
   drawGrid: ->
     @ctx.beginPath()
@@ -227,7 +247,7 @@ class Clock
     d2 = new Date(d.getFullYear(), 0, 1)
     if context is 'second' or 'all'
       @second = ((new Date()).getMilliseconds() / 1000) * 60
-    if context is 'minute' or 'all'
+    if context is 'minute'
       @minute = d.getSeconds() + (parseInt(d.getTime() / 10) % parseInt(d.getTime() / 1000)) / 100
     if context is 'hour' or 'all'
       @hour = d.getMinutes() + (@minute / 60)
@@ -251,3 +271,4 @@ class Clock
     if context is 'earth' or 'all'
       @earth = ((4570000000 + (new Date()).getTime() / 30000000000) / 10000000000) * 60
     @drawClock(context)
+    @changeColors() if context is 'all'

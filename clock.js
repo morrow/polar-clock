@@ -63,44 +63,41 @@ Clock = (function() {
         clock.config[$(this)[0].className] = $(this).val().toLowerCase();
       } else if ($(this)[0].className.match(/smoker/)) {
         clock.config['smoker'] = !!$(this).attr('checked');
-      } else if ($(this)[0].className.match(/birthday/)) {
-        if ($('.birthday').val()) {
-          clock.config.birthday = $('.birthday').val();
-        }
       }
       clock.calculateExpectancy();
       return clock.saveConfig();
     });
-    this.setTime('all');
     window.onresize = __bind(function() {
-      return this.canvas.style.marginTop = parseInt(Math.max(((window.outerHeight - clock.canvas.height) / 3) - 20, 0)) + "px";
+      var margin;
+      margin = (window.outerHeight - clock.canvas.height) / 4;
+      margin = parseInt(Math.max(margin, 0)) + "px";
+      return this.canvas.style.marginTop = margin;
     }, this);
     window.onresize();
+    this.setTime('all');
     window.setInterval((__bind(function() {
-      this.setTime('all');
-      return this.changeColors();
+      return this.setTime('all');
     }, this)), 1000);
     return window.setInterval((__bind(function() {
       return this.setTime('minute');
     }, this)), 20);
   };
   Clock.prototype.calculateExpectancy = function() {
-    var birthday, bmi, current, expectancy;
-    if ($('.birthday').val()) {
+    var birthday, current, expectancy;
+    if ($('.birthday').val() !== this.config.birthday) {
       current = new Date();
       birthday = new Date(this.config.birthday);
       this.config.age = (current.getTime() - birthday.getTime()) / 86400000 / 365;
     }
-    bmi = this.config.bmi;
     expectancy = {
       'male': 75,
       'female': 80
     }[this.config.gender];
-    if (bmi <= 20) {
-      expectancy -= Math.max(20 - bmi, (20 - bmi) / 2);
+    if (this.config.bmi <= 20) {
+      expectancy -= Math.max(20 - this.config.bmi, (20 - this.config.bmi) / 2);
     }
-    if (bmi > 25) {
-      expectancy -= Math.min(bmi - 25, (bmi - 25) / 2);
+    if (this.config.bmi > 25) {
+      expectancy -= Math.min(this.config.bmi - 25, (this.config.bmi - 25) / 2);
     }
     if (this.config.smoker) {
       expectancy -= 10;
@@ -117,7 +114,7 @@ Clock = (function() {
     } catch (error) {
       config = false;
     }
-    if (typeof config === 'object') {
+    if (config instanceof Object) {
       this.config = config;
       $('#options').hide();
     }
@@ -160,12 +157,12 @@ Clock = (function() {
     return this.ctx.closePath();
   };
   Clock.prototype.drawText = function(context) {
-    var item, offset, percent, text, _results;
+    var font_size, item, line, percent, text, x, x_offset, y, y_offset, _results;
     if (context == null) {
       context = 'all';
     }
-    this.ctx.font = 'bold 13px arial';
-    offset = 5;
+    font_size = 15;
+    this.ctx.font = "bold " + (font_size - 2) + "px arial";
     _results = [];
     for (item in this.radii) {
       percent = parseInt((this.styles[item].split(' ')[this.styles[item].split(' ').length - 1]).split(')')[0]);
@@ -174,17 +171,26 @@ Clock = (function() {
       } else {
         this.ctx.fillStyle = 'black';
       }
-      text = '';
-      if (this.config.show_labels) {
-        text = item;
-      }
-      if (this.config.show_labels && this.config.show_percentage) {
-        text += ' - ';
-      }
+      text = [];
       if (this.config.show_percentage) {
-        text += "" + (parseInt(clock[item] / 60 * 100)) + "%";
+        text.push("" + (parseInt(clock[item] / 60 * 100)) + "%");
       }
-      _results.push(text ? this.ctx.fillText(text, this.canvas.width / 2 + offset, this.canvas.height / 2 - this.radii[item] + offset) : void 0);
+      if (this.config.show_labels) {
+        text.push(item);
+      }
+      x_offset = 5 / text.length;
+      y_offset = font_size;
+      _results.push((function() {
+        var _i, _len, _results2;
+        _results2 = [];
+        for (_i = 0, _len = text.length; _i < _len; _i++) {
+          line = text[_i];
+          y = (this.canvas.height / 2 - this.radii[item] + y_offset / (3 - text.length)) - (_i * font_size);
+          x = this.canvas.width / 2 + x_offset;
+          _results2.push(this.ctx.fillText(line, x, y));
+        }
+        return _results2;
+      }).call(this));
     }
     return _results;
   };
@@ -272,7 +278,7 @@ Clock = (function() {
     if (context === 'second' || 'all') {
       this.second = ((new Date()).getMilliseconds() / 1000) * 60;
     }
-    if (context === 'minute' || 'all') {
+    if (context === 'minute') {
       this.minute = d.getSeconds() + (parseInt(d.getTime() / 10) % parseInt(d.getTime() / 1000)) / 100;
     }
     if (context === 'hour' || 'all') {
@@ -308,7 +314,10 @@ Clock = (function() {
     if (context === 'earth' || 'all') {
       this.earth = ((4570000000 + (new Date()).getTime() / 30000000000) / 10000000000) * 60;
     }
-    return this.drawClock(context);
+    this.drawClock(context);
+    if (context === 'all') {
+      return this.changeColors();
+    }
   };
   return Clock;
 })();
