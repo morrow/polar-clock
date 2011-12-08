@@ -52,7 +52,7 @@ class Clock
       if e.target.id is 'options-toggle'
         $('#options').toggle()
       # hide options when settings canvas or okay button is clicked
-      else if e.target.id.match /clock|okay/ or e.target.nodeName is 'body'
+      else if e.target.id.match /clock$|okay$/ or e.target.nodeName is 'body'
         $('#options').hide() 
       # reset options
       else if e.target.id is 'reset'

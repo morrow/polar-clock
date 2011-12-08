@@ -38,7 +38,7 @@ Clock = (function() {
     $('body').live('click', function(e) {
       if (e.target.id === 'options-toggle') {
         return $('#options').toggle();
-      } else if (e.target.id.match(/clock|okay/ || e.target.nodeName === 'body')) {
+      } else if (e.target.id.match(/clock$|okay$/ || e.target.nodeName === 'body')) {
         return $('#options').hide();
       } else if (e.target.id === 'reset') {
         if (confirm("Delete saved configuration data for this clock?")) {
