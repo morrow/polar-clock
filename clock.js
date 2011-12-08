@@ -21,7 +21,7 @@ Clock = (function() {
     };
     this.contexts_available = ['second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'decade', 'life', 'century', 'millenium', 'earth'];
     this.contexts_enabled = ['minute', 'hour', 'day', 'week', 'month', 'year', 'life'];
-    this.radii = [];
+    this.rings = [];
     this.styles = {};
     this.canvas = $('#clock')[0];
     this.ctx = this.canvas.getContext('2d');
@@ -33,7 +33,7 @@ Clock = (function() {
       this.translated = true;
     }
     this.loadConfig();
-    this.setRadii();
+    this.setRings();
     this.calculateExpectancy();
     $('body').live('click', function(e) {
       if (e.target.id === 'options-toggle') {
@@ -55,7 +55,7 @@ Clock = (function() {
       } else if ($(this)[0].nodeName.toLowerCase() === 'select') {
         clock.config[$(this)[0].className] = $(this).val();
       }
-      clock.setRadii();
+      clock.setRings();
       return clock.saveConfig();
     });
     $('#personal-options').delegate('input, select', 'change click keyup blur', function() {
@@ -127,27 +127,27 @@ Clock = (function() {
   Clock.prototype.saveConfig = function() {
     return window.localStorage['config'] = JSON.stringify(this.config);
   };
-  Clock.prototype.setRadii = function() {
+  Clock.prototype.setRings = function() {
     var item, _i, _len, _ref, _results;
     _ref = this.contexts_enabled;
     _results = [];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       item = _ref[_i];
       if (this.config['reverse'] === true) {
-        this.radii[item] = (this.config.line_width * _i) + this.config.line_width;
+        this.rings[item] = (this.config.line_width * _i) + this.config.line_width;
       } else {
-        this.radii[item] = _len * this.config.line_width - this.config.line_width * _i;
+        this.rings[item] = _len * this.config.line_width - this.config.line_width * _i;
       }
       _results.push(this.styles[item] = "hsl(" + this.config.hue + ", 100%, " + (60 - (_i / (_len * 2)) * 100) + "%)");
     }
     return _results;
   };
-  Clock.prototype.draw = function(end, type) {
+  Clock.prototype.draw = function(end, context) {
     var radius, start;
-    radius = this.radii[type];
+    radius = this.rings[context];
     this.ctx.beginPath();
     this.ctx.lineWidth = this.config.line_width + 2;
-    this.ctx.strokeStyle = this.styles[type];
+    this.ctx.strokeStyle = this.styles[context];
     start = Math.PI * 1.5;
     end -= 15;
     end /= 60;
@@ -156,15 +156,14 @@ Clock = (function() {
     this.ctx.stroke();
     return this.ctx.closePath();
   };
-  Clock.prototype.drawText = function(context) {
+  Clock.prototype.drawText = function() {
     var font_size, item, line, percent, text, x, x_offset, y, y_offset, _results;
-    if (context == null) {
-      context = 'all';
-    }
     font_size = 15;
     this.ctx.font = "bold " + (font_size - 2) + "px arial";
+    x_offset = 5;
+    y_offset = font_size;
     _results = [];
-    for (item in this.radii) {
+    for (item in this.rings) {
       percent = parseInt((this.styles[item].split(' ')[this.styles[item].split(' ').length - 1]).split(')')[0]);
       if (this.config.lightlabels) {
         this.ctx.fillStyle = 'white';
@@ -178,14 +177,12 @@ Clock = (function() {
       if (this.config.show_labels) {
         text.push(item);
       }
-      x_offset = 5 / text.length;
-      y_offset = font_size;
       _results.push((function() {
         var _i, _len, _results2;
         _results2 = [];
         for (_i = 0, _len = text.length; _i < _len; _i++) {
           line = text[_i];
-          y = (this.canvas.height / 2 - this.radii[item] + y_offset / (3 - text.length)) - (_i * font_size);
+          y = (this.canvas.height / 2 - this.rings[item] + y_offset / (3 - text.length)) - (_i * font_size);
           x = this.canvas.width / 2 + x_offset;
           _results2.push(this.ctx.fillText(line, x, y));
         }
@@ -220,7 +217,7 @@ Clock = (function() {
       return false;
     }
     clock.config.hue += .01;
-    clock.setRadii();
+    clock.setRings();
     if (clock.config.hue >= 359.99) {
       return clock.config.hue = 0;
     }
@@ -231,21 +228,16 @@ Clock = (function() {
       context = 'all';
     }
     if (!this.config.rotate) {
-      if ($('body')[0].className.match(/rotating/)) {
-        $('body').removeClass('rotating');
-        return $('#clock').css({
-          '-webkit-transform': 'rotate(0deg)',
-          '-moz-transform': 'rotate(0deg)'
-        });
-      }
+      $('body').removeClass('rotating');
+      rotate = 0;
     } else {
       rotate = -parseInt(clock[this.config.rotate_context] * 6 * 1000) / 1000;
       $('body').addClass('rotating');
-      return $('#clock').css({
-        '-webkit-transform': "rotate(" + rotate + "deg)",
-        '-moz-transform': "rotate(" + rotate + "deg)"
-      });
     }
+    return $('#clock').css({
+      '-webkit-transform': "rotate(" + rotate + "deg)",
+      '-moz-transform': "rotate(" + rotate + "deg)"
+    });
   };
   Clock.prototype.drawClock = function(context) {
     var item, _i, _len, _ref;
@@ -265,7 +257,7 @@ Clock = (function() {
       this.minute = 0;
     }
     this.drawGrid(context);
-    this.drawText(context);
+    this.drawText();
     return this.rotateClock(context);
   };
   Clock.prototype.setTime = function(context) {

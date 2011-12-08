@@ -22,8 +22,8 @@ class Clock
     @contexts_available =  ['second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'decade', 'life', 'century', 'millenium', 'earth']
     # enabled contexts
     @contexts_enabled = ['minute', 'hour', 'day', 'week', 'month', 'year', 'life'] 
-    # initialize radii array - contains radii for individual rings
-    @radii = []
+    # initialize Rings array - contains Rings for individual rings
+    @rings = []
     # styles - contains color information for individual rings
     @styles = {}
     # get canvas
@@ -42,8 +42,8 @@ class Clock
       @translated = true
     # load configuration from localStorage
     @loadConfig()
-    # set radii of clock rings
-    @setRadii()
+    # set Rings of clock rings
+    @setRings()
     # calculate life expectancy
     @calculateExpectancy()
     # handle click events
@@ -74,8 +74,8 @@ class Clock
       # handle select inputs
       else if $(@)[0].nodeName.toLowerCase() is 'select'
         clock.config[$(@)[0].className] = $(@).val()
-      # set radii
-      clock.setRadii()
+      # set Rings
+      clock.setRings()
       # save configuration
       clock.saveConfig()
     # handle personal options input
@@ -136,65 +136,90 @@ class Clock
       config = JSON.parse window.localStorage['config'] if window.localStorage['config'] 
     catch error
       config = false
-    # 
+    # update @config with config object
     if config instanceof Object
       @config = config 
       $('#options').hide()
+    # update configuration display
     for item of @config
+      # check that HTML class exists in page
       if $(".#{item}").length
+        # update value from configuration
         if $(".#{item}").attr('type') is 'checkbox'
           $(".#{item}")[0].checked = !!@config[item]
         else
           $(".#{item}").val(@config[item])
 
+  # save configuration
   saveConfig: ->
     window.localStorage['config'] = JSON.stringify @config
     
-  setRadii: ->
+  # set Rings
+  setRings: ->
+    # iterate through enabled contexts
     for item in @contexts_enabled
+      # reverse configuration
       if @config['reverse'] is true
-        @radii[item] = (@config.line_width * _i) + (@config.line_width)
+        @rings[item] = (@config.line_width * _i) + (@config.line_width)
+      # normal configuration
       else
-        @radii[item] = _len * @config.line_width - @config.line_width * _i
+        @rings[item] = _len * @config.line_width - @config.line_width * _i
+      # set coloring of ring
       @styles[item] = "hsl(#{@config.hue}, 100%, #{60 - (_i/(_len*2))*100}%)"
-        
-  draw: (end, type) ->
-    radius = @radii[type]
+  
+  draw: (end, context) ->
+    # get ring radius
+    radius = @rings[context]
+    # draw rings
     @ctx.beginPath()
+    # overlap lines to correct for subtle differences in ring size
     @ctx.lineWidth = @config.line_width + 2
-    @ctx.strokeStyle = @styles[type]
+    # set style
+    @ctx.strokeStyle = @styles[context]
+    # get starting ring position
     start = Math.PI * 1.5
+    # get ending ring position
     end -= 15
-    #end = 44.99999 if end == 45
     end /= 60
     end *= (Math.PI*2)
+    # draw ring
     @ctx.arc(@canvas.width/2, @canvas.height/2, radius, end, start, true)
     @ctx.stroke()
     @ctx.closePath()
 
-  drawText: (context='all') ->
+  drawText: ->
+    # set text styling
     font_size = 15
     @ctx.font = "bold #{font_size-2}px arial"
-    for item of @radii
+    # x offset from left edge of ring
+    x_offset = 5
+    # y offset from top edge of ring
+    y_offset = font_size
+    # draw text for each ring
+    for item of @rings
+      # get percentage of ring progress
       percent = parseInt((@styles[item].split(' ')[@styles[item].split(' ').length-1]).split(')')[0])
-      if @config.lightlabels
-        @ctx.fillStyle = 'white'
-      else
-        @ctx.fillStyle = 'black'
+      # set text color
+      if @config.lightlabels then @ctx.fillStyle = 'white' else @ctx.fillStyle = 'black'
+      # add items of text to text array based on configuration
       text = []
       text.push "#{parseInt(clock[item]/60*100)}%" if @config.show_percentage
       text.push item if @config.show_labels
-      x_offset = (5 / text.length)
-      y_offset = font_size
+      # draw lines of text
       for line in text
-        y = (@canvas.height/2-@radii[item] + y_offset/(3-text.length)) - ((_i) * font_size)
+        # offset text vertically based on number of items in text array
+        y = (@canvas.height/2-@rings[item] + y_offset/(3-text.length)) - ((_i) * font_size)
+        # offset text horizontally based on x_offset
         x = @canvas.width/2 + x_offset
+        # fill text
         @ctx.fillText(line, x, y)
 
   drawGrid: ->
+    # start path
     @ctx.beginPath()
     @ctx.lineWidth = 1
     @ctx.strokeStyle = 'black'
+    # draw + grid over clock
     if @config.show_grid
       @ctx.moveTo(@canvas.width/2, 0)
       @ctx.lineTo(@canvas.width/2, @canvas.height)
@@ -205,46 +230,61 @@ class Clock
       @ctx.lineTo(@canvas.width, @canvas.height)
       @ctx.moveTo(@canvas.width, 0)
       @ctx.lineTo(0, @canvas.height)
+    # draw one line from top center to top middle of clock to make left end-point of rings a crisp edge vs. fuzzy edges
     else
       @ctx.moveTo(@canvas.width/2, 0)
       @ctx.lineTo(@canvas.width/2, @canvas.height/2)
+    # draw grid
     @ctx.stroke()
     @ctx.closePath()
 
   changeColors: ->
+    # changes colors
     return false if not @config.changecolors
+    # update configuration hue
     clock.config.hue += .01
-    clock.setRadii()
+    # draw rings
+    clock.setRings()
+    # reset hue if hue above maximum value
     clock.config.hue = 0  if clock.config.hue >= 359.99
 
   rotateClock: (context='all') ->
+    # rotates clock around 
     if not @config.rotate
-      if $('body')[0].className.match /rotating/
-        $('body').removeClass 'rotating'
-        $('#clock').css
-          '-webkit-transform':'rotate(0deg)'
-          '-moz-transform':'rotate(0deg)'
+      # set rotation to 0
+      $('body').removeClass 'rotating'
+      rotate = 0
     else
+      # set rotation according to context
       rotate = -parseInt(clock[@config.rotate_context]*6*1000)/1000
       $('body').addClass 'rotating'
-      $('#clock').css
-        '-webkit-transform':"rotate(#{rotate}deg)"
-        '-moz-transform':"rotate(#{rotate}deg)"
+    # set styling
+    $('#clock').css
+      '-webkit-transform':"rotate(#{rotate}deg)"
+      '-moz-transform':"rotate(#{rotate}deg)"
 
   drawClock: (context='all') -> 
+    # draw black backgrond
     @ctx.fillStyle = 'black'
     @ctx.fillRect(0, 0, @canvas.width, @canvas.height)
+    # draw each context
     for item in @contexts_enabled
       if item is context or 'all'
         @draw(clock[item], item)
+    # reset minute to 0
     @minute = 0 if @minute > 60
+    # draw grid
     @drawGrid(context)
-    @drawText(context)
+    # draw text
+    @drawText()
+    # rotate clock
     @rotateClock(context)
 
   setTime: (context='all') ->
+    # initialize dates
     d = (new Date())
     d2 = new Date(d.getFullYear(), 0, 1)
+    # set time for each context
     if context is 'second' or 'all'
       @second = ((new Date()).getMilliseconds() / 1000) * 60
     if context is 'minute'
@@ -263,6 +303,7 @@ class Clock
       @decade = (d.getYear() % 10  + ((Math.ceil((d - d2) / 86400000)) / 365) + @hour / 60 / 365) / 10  * 60
     if context is 'life' or 'all'
       @life = ((@config.age*365*24 + (Math.ceil((d - d2) / 86400000)) + @hour / 60)  / (@config.expectancy*365*24)) * 60
+      # update age display
       $('.age').val(@config.age=1) if @life == 60
     if context is 'century' or 'all'
       @century = (((new Date()).getFullYear() % 100) / 100) * 60
@@ -270,5 +311,7 @@ class Clock
       @millenium = (((new Date()).getFullYear() % 1000) / 1000) * 60
     if context is 'earth' or 'all'
       @earth = ((4570000000 + (new Date()).getTime() / 30000000000) / 10000000000) * 60
+    # draw clock
     @drawClock(context)
+    # update coloring
     @changeColors() if context is 'all'
