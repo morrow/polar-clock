@@ -19,8 +19,8 @@ Clock = (function() {
       show_grid: false,
       line_width: 50
     };
-    this.available_contexts = ['second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'decade', 'life', 'century', 'millenium', 'earth'];
-    this.contexts = ['minute', 'hour', 'day', 'week', 'month', 'year', 'life'];
+    this.contexts_available = ['second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'decade', 'life', 'century', 'millenium', 'earth'];
+    this.contexts_enabled = ['minute', 'hour', 'day', 'week', 'month', 'year', 'life'];
     this.radii = [];
     this.styles = {};
     this.canvas = $('#clock')[0];
@@ -35,17 +35,16 @@ Clock = (function() {
     this.loadConfig();
     this.setRadii();
     this.calculateExpectancy();
-    $('#options-toggle').live('click', function(e) {
-      return $('#options').toggle();
-    });
     $('body').live('click', function(e) {
-      if (e.target.id === 'reset') {
+      if (e.target.id === 'options-toggle') {
+        return $('#options').toggle();
+      } else if (e.target.id.match(/clock|okay/ || e.target.nodeName === 'body')) {
+        return $('#options').hide();
+      } else if (e.target.id === 'reset') {
         if (confirm("Delete saved configuration data for this clock?")) {
           delete window.localStorage['config'];
           return window.location.href = window.location.href;
         }
-      } else if (e.target.nodeName.toLowerCase().match(/canvas|button/)) {
-        return $('#options').hide();
       }
     });
     $('#clock-options').delegate('input, select', 'change click keyup blur', function() {
@@ -60,10 +59,8 @@ Clock = (function() {
       return clock.saveConfig();
     });
     $('#personal-options').delegate('input, select', 'change click keyup blur', function() {
-      var value;
-      value = $(this).val().toLowerCase();
-      if ($(this)[0].className.match(/gender|bmi|age/)) {
-        clock.config[$(this)[0].className] = value;
+      if ($(this)[0].className.match(/gender|bmi|age|birthday/)) {
+        clock.config[$(this)[0].className] = $(this).val().toLowerCase();
       } else if ($(this)[0].className.match(/smoker/)) {
         clock.config['smoker'] = !!$(this).attr('checked');
       } else if ($(this)[0].className.match(/birthday/)) {
@@ -75,6 +72,10 @@ Clock = (function() {
       return clock.saveConfig();
     });
     this.setTime('all');
+    window.onresize = __bind(function() {
+      return this.canvas.style.marginTop = parseInt(Math.max(((window.outerHeight - clock.canvas.height) / 3) - 20, 0)) + "px";
+    }, this);
+    window.onresize();
     window.setInterval((__bind(function() {
       this.setTime('all');
       return this.changeColors();
@@ -131,7 +132,7 @@ Clock = (function() {
   };
   Clock.prototype.setRadii = function() {
     var item, _i, _len, _ref, _results;
-    _ref = this.contexts;
+    _ref = this.contexts_enabled;
     _results = [];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       item = _ref[_i];
@@ -152,9 +153,6 @@ Clock = (function() {
     this.ctx.strokeStyle = this.styles[type];
     start = Math.PI * 1.5;
     end -= 15;
-    if (end === 45) {
-      end = 44.99999;
-    }
     end /= 60;
     end *= Math.PI * 2;
     this.ctx.arc(this.canvas.width / 2, this.canvas.height / 2, radius, end, start, true);
@@ -192,13 +190,18 @@ Clock = (function() {
   };
   Clock.prototype.drawGrid = function() {
     this.ctx.beginPath();
-    this.ctx.lineWidth = 2;
-    this.ctx.strokeStyle = 'rgba(0,0,0,.5)';
+    this.ctx.lineWidth = 1;
+    this.ctx.strokeStyle = 'black';
     if (this.config.show_grid) {
       this.ctx.moveTo(this.canvas.width / 2, 0);
       this.ctx.lineTo(this.canvas.width / 2, this.canvas.height);
       this.ctx.moveTo(0, this.canvas.height / 2);
       this.ctx.lineTo(this.canvas.width, this.canvas.height / 2);
+      this.ctx.strokeStyle = 'rgba(0,0,0,.3)';
+      this.ctx.moveTo(0, 0);
+      this.ctx.lineTo(this.canvas.width, this.canvas.height);
+      this.ctx.moveTo(this.canvas.width, 0);
+      this.ctx.lineTo(0, this.canvas.height);
     } else {
       this.ctx.moveTo(this.canvas.width / 2, 0);
       this.ctx.lineTo(this.canvas.width / 2, this.canvas.height / 2);
@@ -245,7 +248,7 @@ Clock = (function() {
     }
     this.ctx.fillStyle = 'black';
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    _ref = this.contexts;
+    _ref = this.contexts_enabled;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       item = _ref[_i];
       if (item === context || 'all') {

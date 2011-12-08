@@ -34,9 +34,9 @@ button {
 }
 
 #clock {
-  width:900px;
-  height:900px;
-  margin:15px auto;
+  width:800px;
+  height:800px;
+  margin:5px auto;
   display:block;
   background:#000;
   z-index:1;

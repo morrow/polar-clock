@@ -18,50 +18,82 @@ class Clock
       show_percentage:  false
       show_grid:        false
       line_width:       50
-    @available_contexts =  ['second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'decade', 'life', 'century', 'millenium', 'earth']
-    @contexts = ['minute', 'hour', 'day', 'week', 'month', 'year', 'life'] 
+    # contexts available to use
+    @contexts_available =  ['second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'decade', 'life', 'century', 'millenium', 'earth']
+    # enabled contexts
+    @contexts_enabled = ['minute', 'hour', 'day', 'week', 'month', 'year', 'life'] 
+    # initialize radii array - contains radii for individual rings
     @radii = []
+    # styles - contains color information for individual rings
     @styles = {}
+    # get canvas
     @canvas = $('#clock')[0]
+    # get canvas context
     @ctx = @canvas.getContext('2d')
+    # setup window variable
     window.clock = @
   
   initialize:->
+    # translate canvas by .5 pixels - trick for better anti-aliasing
     if not @translated
+      # translate canvas
       @ctx.translate(0.5, 0.5) 
+      # set flag, as ctx.translate operates relatively, not absolutely 
       @translated = true
+    # load configuration from localStorage
     @loadConfig()
+    # set radii of clock rings
     @setRadii()
+    # calculate life expectancy
     @calculateExpectancy()
-    $('#options-toggle').live 'click', (e)-> $('#options').toggle()
+    # handle click events
     $('body').live 'click', (e)->
-      if e.target.id is 'reset'
-        if confirm "Delete saved configuration data for this clock?"
-          delete window.localStorage['config']
-          window.location.href = window.location.href
-      else if e.target.nodeName.toLowerCase().match /canvas|button/
+      # toggle options when settings button is clicked
+      if e.target.id is 'options-toggle'
+        $('#options').toggle()
+      # hide options when settings canvas or okay button is clicked
+      else if e.target.id.match /clock|okay/ or e.target.nodeName is 'body'
         $('#options').hide() 
+      # reset options
+      else if e.target.id is 'reset'
+        # confirm delete
+        if confirm "Delete saved configuration data for this clock?"
+          # delete localStorage
+          delete window.localStorage['config']
+          # reload page
+          window.location.href = window.location.href
+    # handle clock options input
     $('#clock-options').delegate 'input, select', 'change click keyup blur', ->
-      if $(this).attr('type') is 'range'
-        clock.config[$(this)[0].className] = Math.max(Math.min($(this).val(), $(this).attr('max')), $(this).attr('min'))
-      else if $(this).attr('type') is 'checkbox'
-        clock.config[$(this)[0].className] = $(this).attr('checked') is 'checked'
-      else if $(this)[0].nodeName.toLowerCase() is 'select'
-        clock.config[$(this)[0].className] = $(this).val()
+      # hangle input[type=range] inputs
+      if $(@).attr('type') is 'range'
+        # use Math.max / Math.min to ensure value is set within acceptable range
+        clock.config[$(@)[0].className] = Math.max(Math.min($(@).val(), $(@).attr('max')), $(@).attr('min'))
+      # handle checkbox inputs
+      else if $(@).attr('type') is 'checkbox'
+        clock.config[$(@)[0].className] = $(@).attr('checked') is 'checked'
+      # handle select inputs
+      else if $(@)[0].nodeName.toLowerCase() is 'select'
+        clock.config[$(@)[0].className] = $(@).val()
+      # set radii
       clock.setRadii()
+      # save configuration
       clock.saveConfig()
+    # handle personal options input
     $('#personal-options').delegate 'input, select', 'change click keyup blur', ->
-      value = $(this).val().toLowerCase()
-      if $(this)[0].className.match /gender|bmi|age/
-        clock.config[$(this)[0].className] = value
-      else if $(this)[0].className.match /smoker/
-        clock.config['smoker'] = !!$(this).attr('checked')
-      else if $(this)[0].className.match /birthday/
+      
+      if $(@)[0].className.match /gender|bmi|age|birthday/
+        clock.config[$(@)[0].className] = $(@).val().toLowerCase()
+      else if $(@)[0].className.match /smoker/
+        clock.config['smoker'] = !!$(@).attr('checked')
+      else if $(@)[0].className.match /birthday/
         if $('.birthday').val()
           clock.config.birthday = $('.birthday').val()
       clock.calculateExpectancy()
       clock.saveConfig()
     @setTime('all')
+    window.onresize = =>
+      @canvas.style.marginTop = parseInt(Math.max(((window.outerHeight-clock.canvas.height)/3)-20, 0)) + "px"
+    window.onresize()
     window.setInterval (=>
       @setTime('all')
       @changeColors()
@@ -103,7 +135,7 @@ class Clock
     window.localStorage['config'] = JSON.stringify @config
     
   setRadii: ->
-    for item in @contexts
+    for item in @contexts_enabled
       if @config['reverse'] is true
         @radii[item] = (@config.line_width * _i) + (@config.line_width)
       else
@@ -117,7 +149,7 @@ class Clock
     @ctx.strokeStyle = @styles[type]
     start = Math.PI * 1.5
     end -= 15
-    end = 44.99999 if end == 45
+    #end = 44.99999 if end == 45
     end /= 60
     end *= (Math.PI*2)
     @ctx.arc(@canvas.width/2, @canvas.height/2, radius, end, start, true)
@@ -141,13 +173,18 @@ class Clock
 
   drawGrid: ->
     @ctx.beginPath()
-    @ctx.lineWidth = 2
-    @ctx.strokeStyle = 'rgba(0,0,0,.5)'
+    @ctx.lineWidth = 1
+    @ctx.strokeStyle = 'black'
     if @config.show_grid
       @ctx.moveTo(@canvas.width/2, 0)
       @ctx.lineTo(@canvas.width/2, @canvas.height)
       @ctx.moveTo(0, @canvas.height/2)
       @ctx.lineTo(@canvas.width, @canvas.height/2)
+      @ctx.strokeStyle = 'rgba(0,0,0,.3)'
+      @ctx.moveTo(0, 0)
+      @ctx.lineTo(@canvas.width, @canvas.height)
+      @ctx.moveTo(@canvas.width, 0)
+      @ctx.lineTo(0, @canvas.height)
     else
       @ctx.moveTo(@canvas.width/2, 0)
       @ctx.lineTo(@canvas.width/2, @canvas.height/2)
@@ -177,7 +214,7 @@ class Clock
   drawClock: (context='all') -> 
     @ctx.fillStyle = 'black'
     @ctx.fillRect(0, 0, @canvas.width, @canvas.height)
-    for item in @contexts
+    for item in @contexts_enabled
       if item is context or 'all'
         @draw(clock[item], item)
     @minute = 0 if @minute > 60
