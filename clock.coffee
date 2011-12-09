@@ -219,23 +219,18 @@ class Clock
     # start path
     @ctx.beginPath()
     @ctx.lineWidth = 1
-    @ctx.strokeStyle = 'black'
+    @ctx.strokeStyle = 'rgba(0,0,0,.5)'
     # draw + grid over clock
     if @config.show_grid
       @ctx.moveTo(@canvas.width/2, 0)
       @ctx.lineTo(@canvas.width/2, @canvas.height)
       @ctx.moveTo(0, @canvas.height/2)
       @ctx.lineTo(@canvas.width, @canvas.height/2)
-      @ctx.strokeStyle = 'rgba(0,0,0,.3)'
-      @ctx.moveTo(0, 0)
-      @ctx.lineTo(@canvas.width, @canvas.height)
-      @ctx.moveTo(@canvas.width, 0)
-      @ctx.lineTo(0, @canvas.height)
-    # draw one line from top center to top middle of clock to make left end-point of rings a crisp edge vs. fuzzy edges
+    # draw one line from top center to top middle of clock to make left end-point of rings a crisp edge
     else
       @ctx.moveTo(@canvas.width/2, 0)
       @ctx.lineTo(@canvas.width/2, @canvas.height/2)
-    # draw grid
+    # draw grid, close path
     @ctx.stroke()
     @ctx.closePath()
 

@@ -195,17 +195,12 @@ Clock = (function() {
   Clock.prototype.drawGrid = function() {
     this.ctx.beginPath();
     this.ctx.lineWidth = 1;
-    this.ctx.strokeStyle = 'black';
+    this.ctx.strokeStyle = 'rgba(0,0,0,.5)';
     if (this.config.show_grid) {
       this.ctx.moveTo(this.canvas.width / 2, 0);
       this.ctx.lineTo(this.canvas.width / 2, this.canvas.height);
       this.ctx.moveTo(0, this.canvas.height / 2);
       this.ctx.lineTo(this.canvas.width, this.canvas.height / 2);
-      this.ctx.strokeStyle = 'rgba(0,0,0,.3)';
-      this.ctx.moveTo(0, 0);
-      this.ctx.lineTo(this.canvas.width, this.canvas.height);
-      this.ctx.moveTo(this.canvas.width, 0);
-      this.ctx.lineTo(0, this.canvas.height);
     } else {
       this.ctx.moveTo(this.canvas.width / 2, 0);
       this.ctx.lineTo(this.canvas.width / 2, this.canvas.height / 2);
