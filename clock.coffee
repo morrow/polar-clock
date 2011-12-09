@@ -110,13 +110,12 @@ class Clock
 
   calculateExpectancy: ->
     # source: http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2662372
-    if $('.birthday').val() != @config.birthday
-      # get current date
-      current = new Date()
-      # get birth date
-      birthday = new Date(@config.birthday)
-      # calculate age from current and birth dates
-      @config.age = (current.getTime() - birthday.getTime()) / 86400000 / 365
+    # get current date
+    current = new Date()
+    # get birth date
+    birthday = new Date(@config.birthday)
+    # calculate age from current and birth dates
+    @config.age = (current.getTime() - birthday.getTime()) / 86400000 / 365
     # initial life expetectancy
     expectancy = {'male':75,'female':80}[@config.gender]
     # if bmi is below healthy range, subtract relative amount from expectancy

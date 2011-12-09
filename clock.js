@@ -84,11 +84,9 @@ Clock = (function() {
   };
   Clock.prototype.calculateExpectancy = function() {
     var birthday, current, expectancy;
-    if ($('.birthday').val() !== this.config.birthday) {
-      current = new Date();
-      birthday = new Date(this.config.birthday);
-      this.config.age = (current.getTime() - birthday.getTime()) / 86400000 / 365;
-    }
+    current = new Date();
+    birthday = new Date(this.config.birthday);
+    this.config.age = (current.getTime() - birthday.getTime()) / 86400000 / 365;
     expectancy = {
       'male': 75,
       'female': 80
