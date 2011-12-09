@@ -204,7 +204,7 @@ class Clock
       if @config.lightlabels then @ctx.fillStyle = 'white' else @ctx.fillStyle = 'black'
       # add items of text to text array based on configuration
       text = []
-      text.push "#{parseInt(clock[item]/60*100)}%" if @config.show_percentage
+      text.push parseInt(clock[item]/60*100) if @config.show_percentage
       text.push item if @config.show_labels
       # draw lines of text
       for line in text
@@ -219,7 +219,7 @@ class Clock
     # start path
     @ctx.beginPath()
     @ctx.lineWidth = 1
-    @ctx.strokeStyle = 'rgba(0,0,0,.5)'
+    @ctx.strokeStyle = 'rgba(0,0,0,.6)'
     # draw + grid over clock
     if @config.show_grid
       @ctx.moveTo(@canvas.width/2, 0)

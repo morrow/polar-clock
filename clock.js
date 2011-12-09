@@ -173,7 +173,7 @@ Clock = (function() {
       }
       text = [];
       if (this.config.show_percentage) {
-        text.push("" + (parseInt(clock[item] / 60 * 100)) + "%");
+        text.push(parseInt(clock[item] / 60 * 100));
       }
       if (this.config.show_labels) {
         text.push(item);
@@ -195,7 +195,7 @@ Clock = (function() {
   Clock.prototype.drawGrid = function() {
     this.ctx.beginPath();
     this.ctx.lineWidth = 1;
-    this.ctx.strokeStyle = 'rgba(0,0,0,.5)';
+    this.ctx.strokeStyle = 'rgba(0,0,0,.6)';
     if (this.config.show_grid) {
       this.ctx.moveTo(this.canvas.width / 2, 0);
       this.ctx.lineTo(this.canvas.width / 2, this.canvas.height);
