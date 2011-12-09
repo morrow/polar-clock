@@ -247,6 +247,8 @@ class Clock
     clock.setRings()
     # reset hue if hue above maximum value
     clock.config.hue = 0  if clock.config.hue >= 359.99
+    # save configuration
+    clock.saveConfig()
 
   rotateClock: (context='all') ->
     # rotates clock around 

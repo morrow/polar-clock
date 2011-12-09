@@ -219,8 +219,9 @@ Clock = (function() {
     clock.config.hue += .01;
     clock.setRings();
     if (clock.config.hue >= 359.99) {
-      return clock.config.hue = 0;
+      clock.config.hue = 0;
     }
+    return clock.saveConfig();
   };
   Clock.prototype.rotateClock = function(context) {
     var rotate;
