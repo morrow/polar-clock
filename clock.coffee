@@ -204,7 +204,7 @@ class Clock
       if @config.lightlabels then @ctx.fillStyle = 'white' else @ctx.fillStyle = 'black'
       # add items of text to text array based on configuration
       text = []
-      text.push parseInt(clock[item]/60*100) if @config.show_percentage
+      text.push "#{parseInt(clock[item]/60*100)}%" if @config.show_percentage
       text.push item if @config.show_labels
       # draw lines of text
       for line in text

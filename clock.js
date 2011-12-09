@@ -173,7 +173,7 @@ Clock = (function() {
       }
       text = [];
       if (this.config.show_percentage) {
-        text.push(parseInt(clock[item] / 60 * 100));
+        text.push("" + (parseInt(clock[item] / 60 * 100)) + "%");
       }
       if (this.config.show_labels) {
         text.push(item);
