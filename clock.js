@@ -78,9 +78,12 @@ Clock = (function() {
     window.setInterval((__bind(function() {
       return this.setTime('all');
     }, this)), 1000);
-    return window.setInterval((__bind(function() {
+    window.setInterval((__bind(function() {
       return this.setTime('minute');
     }, this)), 20);
+    return window.setInterval((__bind(function() {
+      return this.saveConfig();
+    }, this)), 10000);
   };
   Clock.prototype.calculateExpectancy = function() {
     var birthday, current, expectancy;
@@ -217,9 +220,8 @@ Clock = (function() {
     clock.config.hue += .01;
     clock.setRings();
     if (clock.config.hue >= 359.99) {
-      clock.config.hue = 0;
+      return clock.config.hue = 0;
     }
-    return clock.saveConfig();
   };
   Clock.prototype.rotateClock = function(context) {
     var rotate;

@@ -107,6 +107,8 @@ class Clock
     window.setInterval ( => @setTime('all') ), 1000
     # start ticking, update minute context 50 times a second
     window.setInterval ( => @setTime('minute') ), 20
+    # save configuration every 10 seconds
+    window.setInterval ( => @saveConfig() ), 10000
 
   calculateExpectancy: ->
     # source: http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2662372
@@ -246,8 +248,6 @@ class Clock
     clock.setRings()
     # reset hue if hue above maximum value
     clock.config.hue = 0  if clock.config.hue >= 359.99
-    # save configuration
-    clock.saveConfig()
 
   rotateClock: (context='all') ->
     # rotates clock around 
