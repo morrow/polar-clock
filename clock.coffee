@@ -121,7 +121,7 @@ class Clock
     # initial life expetectancy
     expectancy = {'male':75,'female':80}[@config.gender]
     # if bmi is below healthy range, subtract relative amount from expectancy
-    expectancy -= Math.max( 20 - @config.bmi, (20 - @config.bmi) / 2) if @config.bmi <= 20
+    expectancy -= Math.max( 18 - @config.bmi, (18 - @config.bmi) / 2) if @config.bmi <= 18
     # if bmi is above healthy range, subtract relative amount from expectancy
     expectancy -= Math.min(@config.bmi - 25, (@config.bmi - 25) / 2) if @config.bmi > 25
     # subtract 10 if smoker

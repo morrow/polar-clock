@@ -94,8 +94,8 @@ Clock = (function() {
       'male': 75,
       'female': 80
     }[this.config.gender];
-    if (this.config.bmi <= 20) {
-      expectancy -= Math.max(20 - this.config.bmi, (20 - this.config.bmi) / 2);
+    if (this.config.bmi <= 18) {
+      expectancy -= Math.max(18 - this.config.bmi, (18 - this.config.bmi) / 2);
     }
     if (this.config.bmi > 25) {
       expectancy -= Math.min(this.config.bmi - 25, (this.config.bmi - 25) / 2);
