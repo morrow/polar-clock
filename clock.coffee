@@ -105,8 +105,8 @@ class Clock
     @setTime('all')
     # start ticking, update all contexts, colors every second
     window.setInterval ( => @setTime('all') ), 1000
-    # start ticking, update minute context 50 times a second
-    window.setInterval ( => @setTime('minute') ), 20
+    # start ticking, update minute context
+    window.setInterval ( => @setTime('minute') ), 100
     # save configuration every 10 seconds
     window.setInterval ( => @saveConfig() ), 10000
 
@@ -277,35 +277,24 @@ class Clock
     @rotateClock(context)
 
   setTime: (context='all') ->
-    # initialize dates
+    # initialize date
     d = (new Date())
-    d2 = new Date(d.getFullYear(), 0, 1)
     # set time for each context
-    if context is 'second' or 'all'
-      @second = ((new Date()).getMilliseconds() / 1000) * 60
     if context is 'minute'
       @minute = d.getSeconds() + (parseInt(d.getTime() / 10) % parseInt(d.getTime() / 1000)) / 100
-    if context is 'hour' or 'all'
+    else
+      d2 = new Date(d.getFullYear(), 0, 1)
+      @second = ((new Date()).getMilliseconds() / 1000) * 60
       @hour = d.getMinutes() + (@minute / 60)
-    if context is 'day' or 'all'
       @day = (d.getHours() + (@hour / 60)) / 24 * 60
-    if context is 'week' or 'all'
       @week = ((d.getDay() - d.getHours() / 24) / 7) * 60
-    if context is 'month' or 'all'
       @month = (d.getDate() / (32 - new Date(d.getYear(), d.getMonth(), 32).getDate())) * 60 - (1 - @day/60)
-    if context is 'year' or 'all'
       @year = (Math.ceil((d - d2) / 86400000) + @day / 60) / 365 * 60
-    if context is 'decade' or 'all'
       @decade = (d.getYear() % 10  + ((Math.ceil((d - d2) / 86400000)) / 365) + @hour / 60 / 365) / 10  * 60
-    if context is 'life' or 'all'
       @life = ((@config.age*365*24 + (Math.ceil((d - d2) / 86400000)) + @hour / 60)  / (@config.expectancy*365*24)) * 60
-      # update age display
       $('.age').val(@config.age=1) if @life == 60
-    if context is 'century' or 'all'
       @century = (((new Date()).getFullYear() % 100) / 100) * 60
-    if context is 'millenium' or 'all'
       @millenium = (((new Date()).getFullYear() % 1000) / 1000) * 60
-    if context is 'earth' or 'all'
       @earth = ((4570000000 + (new Date()).getTime() / 30000000000) / 10000000000) * 60
     # draw clock
     @drawClock(context)
