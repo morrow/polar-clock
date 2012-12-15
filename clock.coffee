@@ -17,7 +17,7 @@ class Clock
       show_labels:      true
       show_percentage:  false
       show_grid:        false
-      line_width:       45
+      line_width:       $('#clock')[0].height/16
     # contexts available to use
     @contexts_available =  ['second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'decade', 'life', 'century', 'millenium', 'earth']
     # enabled contexts
