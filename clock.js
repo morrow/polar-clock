@@ -83,7 +83,7 @@ Clock = (function() {
     }), 1000);
     window.setInterval((function() {
       return _this.setTime('minute');
-    }), 100);
+    }), 20);
     return window.setInterval((function() {
       return _this.saveConfig();
     }), 10000);
