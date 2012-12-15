@@ -1,6 +1,7 @@
 var Clock;
-var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
 Clock = (function() {
+
   function Clock() {
     this.config = {
       age: 25,
@@ -27,7 +28,9 @@ Clock = (function() {
     this.ctx = this.canvas.getContext('2d');
     window.clock = this;
   }
+
   Clock.prototype.initialize = function() {
+    var _this = this;
     if (!this.translated) {
       this.ctx.translate(0.5, 0.5);
       this.translated = true;
@@ -67,24 +70,25 @@ Clock = (function() {
       clock.calculateExpectancy();
       return clock.saveConfig();
     });
-    window.onresize = __bind(function() {
+    window.onresize = function() {
       var margin;
       margin = (window.outerHeight - clock.canvas.height) / 4;
       margin = parseInt(Math.max(margin, 0)) + "px";
-      return this.canvas.style.marginTop = margin;
-    }, this);
+      return _this.canvas.style.marginTop = margin;
+    };
     window.onresize();
     this.setTime('all');
-    window.setInterval((__bind(function() {
-      return this.setTime('all');
-    }, this)), 1000);
-    window.setInterval((__bind(function() {
-      return this.setTime('minute');
-    }, this)), 20);
-    return window.setInterval((__bind(function() {
-      return this.saveConfig();
-    }, this)), 10000);
+    window.setInterval((function() {
+      return _this.setTime('all');
+    }), 1000);
+    window.setInterval((function() {
+      return _this.setTime('minute');
+    }), 100);
+    return window.setInterval((function() {
+      return _this.saveConfig();
+    }), 10000);
   };
+
   Clock.prototype.calculateExpectancy = function() {
     var birthday, current, expectancy;
     current = new Date();
@@ -106,6 +110,7 @@ Clock = (function() {
     $('.expectancy.output').text(this.config.expectancy = parseInt(expectancy));
     return $('.age.output').text(parseInt(this.config.age * 100) / 100);
   };
+
   Clock.prototype.loadConfig = function() {
     var config, item, _results;
     try {
@@ -121,13 +126,23 @@ Clock = (function() {
     }
     _results = [];
     for (item in this.config) {
-      _results.push($("." + item).length ? $("." + item).attr('type') === 'checkbox' ? $("." + item)[0].checked = !!this.config[item] : $("." + item).val(this.config[item]) : void 0);
+      if ($("." + item).length) {
+        if ($("." + item).attr('type') === 'checkbox') {
+          _results.push($("." + item)[0].checked = !!this.config[item]);
+        } else {
+          _results.push($("." + item).val(this.config[item]));
+        }
+      } else {
+        _results.push(void 0);
+      }
     }
     return _results;
   };
+
   Clock.prototype.saveConfig = function() {
     return window.localStorage['config'] = JSON.stringify(this.config);
   };
+
   Clock.prototype.setRings = function() {
     var item, _i, _len, _ref, _results;
     _ref = this.contexts_enabled;
@@ -143,6 +158,7 @@ Clock = (function() {
     }
     return _results;
   };
+
   Clock.prototype.draw = function(end, context) {
     var radius, start;
     radius = this.rings[context];
@@ -157,6 +173,7 @@ Clock = (function() {
     this.ctx.stroke();
     return this.ctx.closePath();
   };
+
   Clock.prototype.drawText = function() {
     var font_size, item, line, percent, text, x, x_offset, y, y_offset, _results;
     font_size = 15;
@@ -179,19 +196,20 @@ Clock = (function() {
         text.push(item);
       }
       _results.push((function() {
-        var _i, _len, _results2;
-        _results2 = [];
+        var _i, _len, _results1;
+        _results1 = [];
         for (_i = 0, _len = text.length; _i < _len; _i++) {
           line = text[_i];
           y = (this.canvas.height / 2 - this.rings[item] + y_offset / (3 - text.length)) - (_i * font_size);
           x = this.canvas.width / 2 + x_offset;
-          _results2.push(this.ctx.fillText(line, x, y));
+          _results1.push(this.ctx.fillText(line, x, y));
         }
-        return _results2;
+        return _results1;
       }).call(this));
     }
     return _results;
   };
+
   Clock.prototype.drawGrid = function() {
     this.ctx.beginPath();
     this.ctx.lineWidth = 1;
@@ -208,6 +226,7 @@ Clock = (function() {
     this.ctx.stroke();
     return this.ctx.closePath();
   };
+
   Clock.prototype.changeColors = function() {
     if (!this.config.changecolors) {
       return false;
@@ -218,6 +237,7 @@ Clock = (function() {
       return clock.config.hue = 0;
     }
   };
+
   Clock.prototype.rotateClock = function(context) {
     var rotate;
     if (context == null) {
@@ -235,6 +255,7 @@ Clock = (function() {
       '-moz-transform': "rotate(" + rotate + "deg)"
     });
   };
+
   Clock.prototype.drawClock = function(context) {
     var item, _i, _len, _ref;
     if (context == null) {
@@ -256,50 +277,30 @@ Clock = (function() {
     this.drawText();
     return this.rotateClock(context);
   };
+
   Clock.prototype.setTime = function(context) {
     var d, d2;
     if (context == null) {
       context = 'all';
     }
     d = new Date();
-    d2 = new Date(d.getFullYear(), 0, 1);
-    if (context === 'second' || 'all') {
-      this.second = ((new Date()).getMilliseconds() / 1000) * 60;
-    }
     if (context === 'minute') {
       this.minute = d.getSeconds() + (parseInt(d.getTime() / 10) % parseInt(d.getTime() / 1000)) / 100;
-    }
-    if (context === 'hour' || 'all') {
+    } else {
+      d2 = new Date(d.getFullYear(), 0, 1);
+      this.second = ((new Date()).getMilliseconds() / 1000) * 60;
       this.hour = d.getMinutes() + (this.minute / 60);
-    }
-    if (context === 'day' || 'all') {
       this.day = (d.getHours() + (this.hour / 60)) / 24 * 60;
-    }
-    if (context === 'week' || 'all') {
       this.week = ((d.getDay() - d.getHours() / 24) / 7) * 60;
-    }
-    if (context === 'month' || 'all') {
       this.month = (d.getDate() / (32 - new Date(d.getYear(), d.getMonth(), 32).getDate())) * 60 - (1 - this.day / 60);
-    }
-    if (context === 'year' || 'all') {
       this.year = (Math.ceil((d - d2) / 86400000) + this.day / 60) / 365 * 60;
-    }
-    if (context === 'decade' || 'all') {
       this.decade = (d.getYear() % 10 + ((Math.ceil((d - d2) / 86400000)) / 365) + this.hour / 60 / 365) / 10 * 60;
-    }
-    if (context === 'life' || 'all') {
       this.life = ((this.config.age * 365 * 24 + (Math.ceil((d - d2) / 86400000)) + this.hour / 60) / (this.config.expectancy * 365 * 24)) * 60;
       if (this.life === 60) {
         $('.age').val(this.config.age = 1);
       }
-    }
-    if (context === 'century' || 'all') {
       this.century = (((new Date()).getFullYear() % 100) / 100) * 60;
-    }
-    if (context === 'millenium' || 'all') {
       this.millenium = (((new Date()).getFullYear() % 1000) / 1000) * 60;
-    }
-    if (context === 'earth' || 'all') {
       this.earth = ((4570000000 + (new Date()).getTime() / 30000000000) / 10000000000) * 60;
     }
     this.drawClock(context);
@@ -307,5 +308,7 @@ Clock = (function() {
       return this.changeColors();
     }
   };
+
   return Clock;
+
 })();
