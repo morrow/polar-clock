@@ -18,7 +18,7 @@ Clock = (function() {
       show_labels: true,
       show_percentage: false,
       show_grid: false,
-      line_width: 50
+      line_width: 45
     };
     this.contexts_available = ['second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'decade', 'life', 'century', 'millenium', 'earth'];
     this.contexts_enabled = ['minute', 'hour', 'day', 'week', 'month', 'year', 'life'];
