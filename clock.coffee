@@ -106,7 +106,7 @@ class Clock
     # start ticking, update all contexts, colors every second
     window.setInterval ( => @setTime('all') ), 1000
     # start ticking, update minute context
-    window.setInterval ( => @setTime('minute') ), 100
+    window.setInterval ( => @setTime('minute') ), 20
     # save configuration every 10 seconds
     window.setInterval ( => @saveConfig() ), 10000
 
